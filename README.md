@@ -1,1 +1,1 @@
-# [Head on over to the Wiki :)](https://github.com/bevry/hackathon/wiki)
+# [Head on over to the Wiki :)](https://github.com/bevry/startup-hostel/wiki)
