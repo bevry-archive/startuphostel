@@ -19,7 +19,7 @@ html
 article
 	z-index: 52
 	margin: 3em auto
-	width: 86%
+	width: 70%
 	padding: 3%
 	background: rgba(255,255,255,<%-@opacity or '0.5'%>)
 	border: 1px solid black
@@ -96,6 +96,15 @@ a:hover
 		width: 42px
 
 
+
+@media screen and (max-width: 850px)
+	article
+		width: 600px
+
+@media screen and (max-width: 640px)
+	article
+		margin-top: 1em
+		width: 95%
 
 @media screen and (max-width: 960px)
 	.addthis_floating_style
