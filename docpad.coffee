@@ -238,7 +238,7 @@ docpadConfig =
 					# Basics
 					user = users[index]
 					user.text or= user.name + (if user.bio then ": #{user.bio}" else '')
-					user.website or= (if user.twitter then "http://twitter.com/#{user.twitter}" else null) or user.facebook
+					user.website or= (if user.twitter then "http://twitter.com/#{user.twitter}") or (if user.facebook then "https://www.facebook.com/#{user.facebook}") or null
 					user.avatar or= null
 
 					# Avatar
