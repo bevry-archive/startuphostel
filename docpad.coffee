@@ -1,6 +1,9 @@
 # Import
 balUtil = require('bal-util')
 feedr = new (require('feedr')).Feedr
+createsend = require('createsend')
+createsendConnection = new createsend(process.env.CM_KEY)
+
 ###
 twit = require('twit')
 twitConnection = new twit(
@@ -161,7 +164,7 @@ docpadConfig =
 					for check in checks
 						if user[check] and user[check] is newUser[check]
 							for own key,value of newUser
-								user[key] or= value
+								user[key] or= value or null
 							return user
 				users.push(newUser)
 				return newUser
@@ -201,6 +204,23 @@ docpadConfig =
 					user.facebook = (row.facebookurl or '').replace(/^.+com\//,'').replace(/\//g,'')
 					user.website = row.websiteurl
 					addUser(user)
+
+			# Campaign Monitor Users
+			tasks.push (next) ->
+				createsendConnection.listActive process.env.CM_LIST_ID, null, (err,data) ->
+					return next(err)  if err
+					for result in data.Results
+						# Apply user information
+						user = {}
+						user.name = result.Name
+						user.email = result.EmailAddress
+						user.skype = null
+						user.twitter = null
+						for customField in result.CustomFields
+							customFieldKey = customField.Key.toLowerCase()
+							user[customFieldKey] or= customField.Value or null
+						addUser(user)
+					return next()
 
 			# Twitter Users
 			tasks.push (next) ->
