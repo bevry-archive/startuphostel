@@ -63,9 +63,9 @@ We're aiming for a max of $3000 for a month and $2000 for 2 weeks for this initi
 
 ## Register
 
-<p>
-	<%- @partial('subscribe') %> and we'll get in touch shortly after that. You can also follow us on <a href="https://twitter.com/StartupHostel">Twitter</a>, join our <a href="https://www.facebook.com/groups/bevry.hackathon/">Facebook Group</a>, and chat on our <a href="http://webchat.freenode.net/?channels=startuphostel">IRC Chat Room</a> (<code>#startuphostel</code> on freenode).
-</p>
+<div>
+	<%- @partial('subscribe') %> and we'll get in touch shortly after that. You can also <%- @getTwitterFollowButton() %>, join our <a href="https://www.facebook.com/groups/bevry.hackathon/">Facebook Group</a>, and chat with us on <a href="http://webchat.freenode.net/?channels=startuphostel">IRC</a> (<code>#startuphostel</code> on freenode).
+</div>
 
 These <%- @users.length %> people have already registered their interest:
 
