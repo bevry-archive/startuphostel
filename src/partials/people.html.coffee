@@ -7,7 +7,7 @@ aside ".people", ->
 				showAvatar = =>
 					img src:@cachr(user.avatar), alt:"#{h user.name}"
 				if user.website
-					a href:"#{h user.websiteurl}", showAvatar
+					a href:"#{h user.website}", showAvatar
 				else
 					showAvatar()
 	div ".clear", ->

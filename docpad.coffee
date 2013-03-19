@@ -1,5 +1,4 @@
 # Import
-console.log process.env
 balUtil = require('bal-util')
 feedr = new (require('feedr')).Feedr
 ###
@@ -145,8 +144,21 @@ docpadConfig =
 		# Prepare our spreadsheet
 		extendTemplateData: (opts,next) ->
 			# Prepare
+			docpad = @docpad
 			tasks = new balUtil.Group(next)
 			users = []
+
+			# Find User or Create
+			addUser = (newUser) ->
+				for user in users
+					checks = ['name','email','skype','twitter','facebook','website']
+					for check in checks
+						if user[check] and user[check] is newUser[check]
+							for own key,value of newUser
+								user[key] or= value
+							return user
+				users.push(newUser)
+				return newUser
 
 			# Spreadsheet Connection
 			tasks.push (next) ->
@@ -175,13 +187,14 @@ docpadConfig =
 				for row in spreadsheetRows
 					# Apply user information
 					user = {}
-					users.push(user)
 					user.name = row.name or row.title or row.twitterusername or row.skypeusername
+					user.email = row.email
 					user.bio = row.bio
 					user.skype = row.skypeusername
 					user.twitter = row.twitterusername
 					user.facebook = (row.facebookurl or '').replace(/^.+com\//,'').replace(/\//g,'')
 					user.website = row.websiteurl
+					addUser(user)
 
 			# Twitter Users
 			tasks.push (next) ->
@@ -194,13 +207,13 @@ docpadConfig =
 					for twitterData in (data.users or [])
 						# Apply user information
 						user = {}
-						users.push(user)
 						user.name = twitterData.name
 						user.bio = twitterData.description
 						user.twitter = twitterData.screen_name
 						user.twitterID = twitterData.id
 						user.website = twitterData.url or "http://twitter.com/#{twitterData.screen_name}"
 						user.avatar = twitterData.profile_image_url or null
+						addUser(user)
 
 					# Done
 					return next()
@@ -210,38 +223,40 @@ docpadConfig =
 				# Prepare
 				userTasks = new balUtil.Group (err) ->
 					return next(err)  if err
+					docpad.log 'info', "Fetched #{users.length} users"
 					opts.templateData.users = users
 					return next()
 
 				# Users
-				balUtil.each users, (user) ->  userTasks.push (next) ->
+				balUtil.each users, (user,index) ->  userTasks.push (next) ->
 					# Basics
-					user.website = user.website or (if user.twitter then "http://twitter.com/#{user.twitter}" else null) or user.facebook
-					user.avatar = null
-					users.push(user)
+					user = users[index]
+					user.text or= user.name + (if user.bio then ": #{user.bio}" else '')
+					user.website or= (if user.twitter then "http://twitter.com/#{user.twitter}" else null) or user.facebook
+					user.avatar or= null
 
 					# Avatar
 					avatarTasks = new balUtil.Group(next)
 
 					# Avatar: Facebook
 					avatarTasks.push (next) ->
-						return next()  if user.avatarurl or !user.facebook
-						user.avatar = "http://graph.facebook.com/#{user.facebook}/picture"
+						return next()  if user.avatar or !user.facebook
+						user.avatar or= "http://graph.facebook.com/#{user.facebook}/picture"
 						return next()
 
 					# Avatar: Twitter
 					avatarTasks.push (next) ->
-						return next()  if user.avatarurl or !user.twitter
+						return next()  if user.avatar or !user.twitter
 						feedr.readFeed "http://api.twitter.com/1/users/lookup.json?screen_name=#{user.twitter}", (err,twitterData) ->
 							return next(err)  if err
-							user.avatar = twitterData.profile_image_url or null
+							user.avatar or= twitterData.profile_image_url or null
 							return next()
 
 					# Avatar: Email
 					avatarTasks.push (next) ->
-						return next()  if user.avatarurl or !user.email
+						return next()  if user.avatar or !user.email
 						emailhash = require('crypto').createHash('md5').update(user.email).digest("hex")
-						user.avatar = "http://www.gravatar.com/avatar/#{emailhash}"
+						user.avatar or= "http://www.gravatar.com/avatar/#{emailhash}"
 						return next()
 
 					# Avatar: run
