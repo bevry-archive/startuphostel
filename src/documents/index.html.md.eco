@@ -14,31 +14,31 @@ layout: default
 
 
 ## What
-Startup Hostel is an all year round work retreat for the doers of the world. You can stay as long or as little as you like. You buy the tickets for the hostel, and we'll cover your standard life expenses for your stay (accommodation, food, wifi, etc). You buy outside the hostel expenses like your flight tickets, visa, etc.
+Startup Hostel is an all year round work retreat for the doers of the world. You can stay as long or as little as you like. You buy the tickets for the hostel and we'll cover your standard life expenses for your stay (accommodation, food, wifi, etc) - you pay for your own outside the hostel expenses like flights, visa, night clubbing, etc.
 
 Generally, those interested fall into these four groups:
 
 
 ### The Entrepreneur
-You can work anywhere and everywhere! You have some savings lined up and are wanting your dollars to go as far as possible while you work on your great idea. It can get a bit lonely living by yourself late at night eating two minute noodles, so for the same price you'd much rather live with a ton of passionate amazing people in an amazing location, where you can bounce your ideas of others and potential hire some juniors to help you make your next big thing. The hostel will provide that affordable environment of amazing people and amazing location, it's all you could hope for at this stage.
+You can work anywhere and everywhere! You have some savings lined up and are wanting your dollars to go as far as possible while you work on your great idea. It can get a bit lonely living by yourself late at night eating two minute noodles, so for the same price you'd much rather live with a ton of passionate amazing people in an amazing location, where you can bounce your ideas off others and potentially hire some of the residents to help make the next big thing. The hostel will provide an affordable environment of amazing people and an amazing location, it's all you could hope for at this stage.
 
 ### The Student
-Fresh out school or still in school! You've got a lot of passion but may not have the skills or finances yet to make meaningful change. You'd like to really immerse yourself with other passionate people, put your potential to great use, develop great employable skills, while being mindful of your finances. The hostel offers you an affordable environment of amazing people supportive and fruitful of your personal growth, as well as work opportunities with the residents to help develop skills and secure your finances.
+Fresh out school or still in school! You've got a lot of passion but may not have all the skills or finances yet to make meaningful change. You'd really like to immerse yourself with other passionate people, put your potential to great use, develop great employable skills; while being mindful of your finances. The hostel offers you an affordable environment of amazing and supportive people who are fruitful of your personal growth, as well as work opportunities to help develop skills and secure your finances.
 
 ### The Apprentice
-You're skilled as heck, but stuck in the 9-5 drag and confident that you can do more. You're looking for an opportunity which can unleash your full potential and just be surrounded by more amazing people like you. The hostel will be able to provide you with work opportunities that may pay a portion or perhaps even all of your stay here, as well as an amazing new environment of friends and support to help grow you further down your path of career, friendship and success.
+You're skilled as heck, but stuck in the 9-5 drag and confident you can do more. You're looking for an opportunity which can unleash your full potential and just be surrounded by more amazing people like you! The hostel will be able to provide you with unique work opportunities that could be able to pay a portion or perhaps even all of your stay here, as well as an amazing new environment of friends and support to help grow yourself further down your path of career, friendship and success.
 
 ### The Happy Employee
-You're one of the few who love their current job and would never dream of leaving it. Your employer loves letting you attend the latest workshops, conferences, trainings and getaways because they know that a happy and talented employee is a great asset for the company. The hostel offers you an investment to re-invigorate yourself to greater levels of enthusiasm, bring home new tangible actions and skills, as well as expose a new community to your company's work by running workshops at the hostel.
+You're one of the few who love their current job and would never dream of leaving it. Your employer loves letting you attend the latest workshops, conferences, trainings and getaways because they know a happy and talented employee is a great asset to the company. The hostel offers you an investment to re-invigorate yourself to greater levels of enthusiasm, bring home new tangible skills and actions, as well as expose a new community to your company's work by running workshops at the hostel.
 
 
 ## Schedule
 The hostel will have a very loose schedule, meaning that all events are optional, however out of the feedback of those interested we've come up with the following schedule:
 
-- 7-10am - Breakfast provided
-- 10-10.30am - Morning Standup - you can discuss what you'll be working on, problems you're facing, and plan your day - it's a great opportunity for people to team up and help each other on shared interests
-- 12-3pm - Lunch provided
-- 7-9pm - Group dinner - an opportunity to talk about what you got done for the day, do your cheers and thanks, and relax in a more casual environment
+- 7-10am - Breakfast Provided
+- 10-10.30am - Morning Stand-Up - you can discuss what you'll be working on, problems you're facing, and plan your day - it's a great opportunity for people to team up and help each other on shared interests
+- 12-3pm - Lunch Provided
+- 7-9pm - Group Dinner - a great opportunity to talk about what you got done for the day, do your cheers and thanks, and relax in a more casual environment
 
 Each Friday night 6-9pm there will be lightning talks were people can showcase anything nifty they've done throughout the week.
 
@@ -64,8 +64,7 @@ We're aiming for a max of $3000 for a month and $2000 for 2 weeks for this initi
 ## Register
 
 <p>
-	<%- @partial('subscribe') %> and we'll get in touch shortly after that.
-	You can also <%- @getTwitterFollowButton().replace(/\n/g,'').replace(/div/g,'span') %> and join our <a href="https://www.facebook.com/groups/bevry.hackathon/">Facebook Group</a> and <a href="http://webchat.freenode.net/?channels=startuphostel">IRC Chat Room</a> (<code>#startuphostel</code> on freenode).
+	<%- @partial('subscribe') %> and we'll get in touch shortly after that. You can also follow us on <a href="https://twitter.com/StartupHostel">Twitter</a>, join our <a href="https://www.facebook.com/groups/bevry.hackathon/">Facebook Group</a>, and chat on our <a href="http://webchat.freenode.net/?channels=startuphostel">IRC Chat Room</a> (<code>#startuphostel</code> on freenode).
 </p>
 
 These <%- @users.length %> people have already registered their interest:
