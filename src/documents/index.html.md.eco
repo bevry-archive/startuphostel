@@ -1,0 +1,86 @@
+---
+layout: default
+---
+
+# Startup Hostel, a home in paradise for the doers of the world.
+
+
+## Why?
+
+- Keep costs down low
+- Learn from amazing people
+- Work on what you want
+- In an amazing location
+
+
+## What
+Startup Hostel is an all year round work retreat for the doers of the world. You can stay as long or as little as you like. You buy the tickets for the hostel, and we'll cover your standard life expenses for your stay (accomodation, food, wifi, etc). You buy outside the hostel expenses like your flight tickets, visa, etc.
+
+Generally, those interested fall into these four groups:
+
+
+### The Entrepreneur
+You can work anywhere and everywhere! You have some savings lined up and are wanting your dollars to go as far as possible while you work on your great idea. It can get a bit lonely living by yourself late at night eating two minute noodles, so for the same price you'd much rather live with a ton of passionaite amazing people in an amazing location, where you can bounce your ideas of others and potential hire some juniors to help you make your next big thing. The hostel will provide that affordable environment of amazing people and amazing location, it's all you could hope for at this stage.
+
+### The Student
+Fresh out school or still in school! You've got a lot of passion but may not have the skills or finances yet to make meaninful change. You'd like to really immerse yourself with other passionate people, put your potential to great use, develop great employable skills, while being mindful of your finances. The hostel offers you an affordable environment of amazing people supportive and fruitful of your personal growth, as well as work opportunities with the residents to help develop skills and secure your finances.
+
+### The Apprentice
+You're skilled as heck, but stuck in the 9-5 drag and confident that you can do more. You're looking for an opportunity which can unleash your full potential and just be surrounded by more amazing people like you. The hostel will be able to provide you with work opportunities that may pay a portion or perhaps even all of your stay here, as well as an amazing new environment of friends and support to help grow you further down your path of career, friendship and success.
+
+### The Happy Employee
+You're one of the few who love their current job and would never dream of leaving it. Your employer loves letting you attend the latest workshops, conferences, trainings and getaways because they know that a happy and talented employee is a great asset for the company. The hostel offers you an investment to re-invigorate yourself to greater levels of enthusiasm, bring home new tangible actions and skills, as well as expose a new community to your company's work by running workshops at the hostel.
+
+
+## Schedule
+The hostel will have a very loose schedule, meaning that all events are optional, however out of the feedback of those interested we've come up with the following schedule:
+
+- 7-10am - Breakfast provided
+- 10-10.30am - Morning Standup - you can discuss what you'll be working on, problems you're facing, and plan your day - it's a great opportunity for people to team up and help each other on shared interests
+- 12-3pm - Lunch provided
+- 7-9pm - Group dinner - an opportunity to talk about what you got done for the day, do your cheers and thanks, and relax in a more casual environment
+
+Each Friday night 6-7pm there will be lightning talks were people can showcase anything nifty they've done throughout the week.
+
+Every second Saturday we will hold presentations, workshops, and trainings that will be promoted outside the hostel to draw even bigger crowds, this is a great opportunity for you to showcase your work, present, network, and help make each other even better.
+
+
+## Values
+The hostel is founded on the values of open-collaboration; abundant and inclusive sharing of information, knowledge and expertise. It's the same principles behind the free culture movement, that of which open-source is a tool of. While closed source companies are welcome here, we expect that all companies share their expertise with each other and consider the hostel one big company with many individual projects, of which none are competitors but only allies and alternatives.
+
+
+## When
+Setup for the hostel is underway and we're aiming to launch in Bali pretty darn soon. We're currently getting in contact with those interested, collecting deposits and scoping out the final locations. Once suffecient deposits have been received we'll book the hostel for the period and start accepting arrivals.
+
+
+## Who
+Who's behind this? The awesome team behind [Bevry](http://bevry.me/about), which is an amazing open-source agency based in Sydney, Australia dedicated to empowering individuals everywhere.
+
+
+## Tickets
+We're aiming for a max of $3000 for a month and $2000 for 2 weeks for this initial batch. The ticket includes all your hostel life expenses, that being; accomodation, food, drinks, wifi, coworking area, and presentation area, with you only having to pay extra for your own extra-curriculum activities and outside the hostel expenses. This allows you to live in the hostel cheaper and in much better fashion (e.g. swimming pools, bars, massages, beaches) than back in the western world were living expenses are usually over $4000/month.
+
+
+## Register
+
+<p>
+	To register your interest <%- @partial('subscribe') %> then add your details to this <a href="https://docs.google.com/spreadsheet/ccc?key=0AqMqiLy7C3PhdFc3bTBXNTQzNG02WEdGNmxaWHBVVFE#gid=0">Google Spreadsheet</a> with your requirements.
+	We'll get in touch shortly after that.
+	You can also <%- @getTwitterFollowButton().replace(/\n/g,'').replace(/div/g,'span') %> and join our <a href="https://www.facebook.com/groups/bevry.hackathon/">Facebook Group</a> and <a href="http://webchat.freenode.net/?channels=startuphostel">IRC Chat Room</a> (<code>#startuphostel</code> on freenode).
+</p>
+
+
+## Future
+This is just the beginning. We plan on open-sourcing and documenting all the information in regards to the setup and maintenance of the hostel enabling others to create their own in their own ideal locations. We are especially keen on setting up another location in either [Vietnam](https://www.google.com.au/search?q=vietnam+beach&tbm=isch), [Thailand](https://www.google.com.au/search?q=thailand+beach&tbm=isch) or [Goa](https://www.google.com.au/search?q=Goa+beach&tbm=isch) in October 2013 as wet season hits Bali, so we can migrate over there for a while, then following on to either [Madagascar](https://www.google.com.au/search?q=madagascar+beach&tbm=isch), [Seychelles](https://www.google.com.au/search?q=seychelles+beach&tbm=isch) or [Fiji](https://www.google.com.au/search?q=fiji+beach&tbm=isch) thereafter as well as other locations. Though any location is good by us, the big vision is to have locations all over world, were people can just hop from one location to the other whenever they want and always maintain that awesome community of people regardless.
+
+
+## Picture
+The wallpaper of this website was taken by [Joshua Gourneau](http://josh.gourneau.com) at [Startup Workaway](http://startupworkaway.com/) 2013, a two week retreat in Thailand that Startup Hostel founder Benjamin Lupton attended. The person in the photo is [Philip Ashlock](http://phil.ashlock.us), an open-goverment enthusiast, working during dusk in the restaruant of the accomodation. You can see the complete gallary of the event [here](https://www.facebook.com/media/set/?set=a.10100736090530565.2700291.9410692&type=3), [here](https://www.facebook.com/media/set/?set=a.10150606180140670.380974.620410669&type=3) and [here](https://www.facebook.com/media/set/?set=a.525284590378.2033297.206700536&type=3) (facebook login required). [We also use this favicon](http://commons.wikimedia.org/wiki/File:Gfi-set01-hostel.png).
+
+
+## Share
+
+
+<div class="social-buttons">
+	<%- @getSocialButtons(['TwitterFollow','FacebookLike','TwitterTweet','GooglePlusOne','RedditSubmit','HackerNewsSubmit']) %>
+</div>
