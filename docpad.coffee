@@ -196,13 +196,13 @@ docpadConfig =
 				for row in spreadsheetRows
 					# Apply user information
 					user = {}
-					user.name = row.name or row.title or row.twitterusername or row.skypeusername
-					user.email = row.email
-					user.bio = row.bio
-					user.skype = row.skypeusername
-					user.twitter = row.twitterusername
-					user.facebook = (row.facebookurl or '').replace(/^.+com\//,'').replace(/\//g,'')
-					user.website = row.websiteurl
+					user.name = row.name or row.title or row.twitterusername or row.skypeusername or null
+					user.email = row.email or null
+					user.bio = row.bio or null
+					user.skype = row.skypeusername or null
+					user.twitter = row.twitterusername or null
+					user.facebook = (row.facebookurl or '').replace(/^.+com\//,'').replace(/\//g,'') or null
+					user.website = row.websiteurl or null
 					addUser(user)
 
 			# Campaign Monitor Users
@@ -212,7 +212,7 @@ docpadConfig =
 					for result in data.Results
 						# Apply user information
 						user = {}
-						user.name = result.Name
+						user.name = result.Name or null
 						user.email = result.EmailAddress
 						user.skype = null
 						user.twitter = null
@@ -224,21 +224,41 @@ docpadConfig =
 
 			# Twitter Users
 			tasks.push (next) ->
-				# Fetch list
 				feedr.readFeed "http://api.twitter.com/1/statuses/followers.json?screen_name=StartupHostel&cursor=-1", (err,data) ->
 					return next(err)  if err
 					return next(data.errors[0].message)  if data?.errors?[0]?.message
 
 					# Users
-					for twitterData in (data.users or [])
+					for twitterUser in (data.users or [])
 						# Apply user information
 						user = {}
-						user.name = twitterData.name
-						user.bio = twitterData.description
-						user.twitter = twitterData.screen_name
-						user.twitterID = twitterData.id
-						user.website = twitterData.url or "http://twitter.com/#{twitterData.screen_name}"
-						user.avatar = twitterData.profile_image_url or null
+						user.name = twitterUser.name
+						user.bio = twitterUser.description or null
+						user.twitter = twitterUser.screen_name
+						user.twitterID = twitterUser.id
+						user.website = twitterUser.url or "http://twitter.com/#{twitterUser.screen_name}"
+						user.avatar = twitterUser.profile_image_url or null
+						addUser(user)
+
+					# Done
+					return next()
+
+			# Facebook Users
+			tasks.push (next) ->
+				fields = "about address bio email accounts gender name id religion username".replace(/\s/g,'%2C')
+				feedr.readFeed "https://graph.facebook.com/#{process.env.FACEBOOK_GROUP_ID}/members?fields=#{fields}&method=GET&format=json&callback=cb&access_token=#{process.env.FACEBOOK_ACCESS_TOKEN}", (err,data) ->
+					return next(err)  if err
+
+					# Users
+					for facebookUser in data.data
+						# Apply user information
+						user = {}
+						user.name = facebookUser.name or null
+						user.bio = facebookUser.bio or null
+						user.gender = facebookUser.gender or null
+						user.email = (facebookUser.email or '').replace('\u0040','@') or null
+						user.facebook = facebookUser.username
+						user.facebookID = facebookUser.id
 						addUser(user)
 
 					# Done
@@ -273,9 +293,9 @@ docpadConfig =
 					# Avatar: Twitter
 					avatarTasks.push (next) ->
 						return next()  if user.avatar or !user.twitter
-						feedr.readFeed "http://api.twitter.com/1/users/lookup.json?screen_name=#{user.twitter}", (err,twitterData) ->
+						feedr.readFeed "http://api.twitter.com/1/users/lookup.json?screen_name=#{user.twitter}", (err,twitterUser) ->
 							return next(err)  if err
-							user.avatar or= twitterData.profile_image_url or null
+							user.avatar or= twitterUser.profile_image_url or null
 							return next()
 
 					# Avatar: Email
