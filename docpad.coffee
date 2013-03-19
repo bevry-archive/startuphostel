@@ -56,7 +56,7 @@ docpadConfig = {
 
 			# The website description (for SEO)
 			description: """
-				Startup Hostel is an all year round work retreat in paradise for the doers of the world; you keep your costs down low, work on what you want, learn from amazing people, in amazing locaitons. You buy the tickets for the hostel, and we'll cover your standard life expenses for your stay (accommodation, food, wifi, etc).
+				Startup Hostel is an all year round work retreat in paradise for the doers of the world; you keep your costs down low, work on what you want, learn from amazing people, in amazing locaitons.
 				"""
 
 			# The website keywords (for SEO) separated by commas
