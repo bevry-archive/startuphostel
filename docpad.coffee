@@ -1,6 +1,16 @@
 # Import
+console.log process.env
 balUtil = require('bal-util')
 feedr = new (require('feedr')).Feedr
+###
+twit = require('twit')
+twitConnection = new twit(
+	consumer_key: process.env.TWITTER_CONSUMER_KEY
+	consumer_secret: process.env.TWITTER_CONSUMER_SECRET
+	access_token: process.env.TWITTER_ACCESS_TOKEN
+	access_token_secret: process.env.TWITTER_ACCESS_TOKEN_SECRET
+)
+###
 
 # Background
 backgrounds =
@@ -34,7 +44,8 @@ backgrounds =
 backgroundSelection = 'us2'
 
 # Spreadsheet
-spreadsheet = null
+spreadsheetConnection = null
+spreadsheetInfo = null
 spreadsheetRows = null
 
 # DocPad Configuration
@@ -133,39 +144,80 @@ docpadConfig =
 		# Extend Template Data
 		# Prepare our spreadsheet
 		extendTemplateData: (opts,next) ->
-			# Connect to the spreadsheet
-			connect = (next) ->
-				return next()  if spreadsheet?
-				spreadsheet = new (require('google-spreadsheet'))(process.env.GOOGLE_SPREADSHEET_KEY)
-				return spreadsheet.setAuth(process.env.GOOGLE_USERNAME, process.env.GOOGLE_PASSWORD, next)
+			# Prepare
+			tasks = new balUtil.Group(next)
+			users = []
 
-			# Fetch spreadsheet info
-			fetchRows = (next) ->
-				return next()  if spreadsheetRows?
-				spreadsheet.getInfo (err,info) ->
+			# Spreadsheet Connection
+			tasks.push (next) ->
+				return next()  if spreadsheetConnection?
+				spreadsheetConnection = new (require('google-spreadsheet'))(process.env.GOOGLE_SPREADSHEET_KEY)
+				return spreadsheetConnection.setAuth(process.env.GOOGLE_USERNAME, process.env.GOOGLE_PASSWORD, next)
+
+			# Spreadsheet Info
+			tasks.push (next) ->
+				return next()  if spreadsheetInfo?
+				spreadsheetConnection.getInfo (err,info) ->
 					return next(err)  if err
-					info.worksheets[0].getRows (err,rows) ->
-						return next(err)  if err
-						spreadsheetRows = rows
-						return next()
+					spreadsheetInfo = info
+					return next()
 
-			# Fetch Users
-			fetchUsers = (next) ->
-				users = []
+			# Spreadsheet Rows
+			tasks.push (next) ->
+				return next() if spreadsheetRows?
+				spreadsheetInfo.worksheets[0].getRows (err,rows) ->
+					return next(err)  if err
+					spreadsheetRows = rows
+					return next()
+
+			# Speadsheet Users
+			tasks.push ->
+				for row in spreadsheetRows
+					# Apply user information
+					user = {}
+					users.push(user)
+					user.name = row.name or row.title or row.twitterusername or row.skypeusername
+					user.bio = row.bio
+					user.skype = row.skypeusername
+					user.twitter = row.twitterusername
+					user.facebook = (row.facebookurl or '').replace(/^.+com\//,'').replace(/\//g,'')
+					user.website = row.websiteurl
+
+			# Twitter Users
+			tasks.push (next) ->
+				# Fetch list
+				feedr.readFeed "http://api.twitter.com/1/statuses/followers.json?screen_name=StartupHostel&cursor=-1", (err,data) ->
+					return next(err)  if err
+					return next(data.errors[0].message)  if data?.errors?[0]?.message
+
+					# Users
+					for twitterData in (data.users or [])
+						# Apply user information
+						user = {}
+						users.push(user)
+						user.name = twitterData.name
+						user.bio = twitterData.description
+						user.twitter = twitterData.screen_name
+						user.twitterID = twitterData.id
+						user.website = twitterData.url or "http://twitter.com/#{twitterData.screen_name}"
+						user.avatar = twitterData.profile_image_url or null
+
+					# Done
+					return next()
+
+			# Normalize Fields
+			tasks.push (next) ->
+				# Prepare
 				userTasks = new balUtil.Group (err) ->
 					return next(err)  if err
 					opts.templateData.users = users
 					return next()
 
 				# Users
-				balUtil.each spreadsheetRows, (row) ->  userTasks.push (next) ->
+				balUtil.each users, (user) ->  userTasks.push (next) ->
 					# Basics
-					user = {}
-					user.name = row.name or row.title or row.twitterusername or row.skypeusername
-					user.bio = row.bio
-					user.text = user.name + (if user.bio then ": #{user.bio}" else "")
-					user.websiteurl = row.websiteurl or (if row.twitterusername then "http://twitter.com/#{row.twitterusername}" else null) or row.facebookurl
-					user.avatarurl = null
+					user.website = user.website or (if user.twitter then "http://twitter.com/#{user.twitter}" else null) or user.facebook
+					user.avatar = null
 					users.push(user)
 
 					# Avatar
@@ -173,24 +225,23 @@ docpadConfig =
 
 					# Avatar: Facebook
 					avatarTasks.push (next) ->
-						return next()  if user.avatarurl or !row.facebookurl
-						facebookusername = row.facebookurl.replace(/^.+com\//,'').replace(/\//g,'')
-						user.avatarurl = "http://graph.facebook.com/#{facebookusername}/picture"
+						return next()  if user.avatarurl or !user.facebook
+						user.avatar = "http://graph.facebook.com/#{user.facebook}/picture"
 						return next()
 
 					# Avatar: Twitter
 					avatarTasks.push (next) ->
-						return next()  if user.avatarurl or !row.twitterusername
-						feedr.readFeed "https://api.twitter.com/1/users/show.json?screen_name=#{row.twitterusername}", (err,twitterdata) ->
+						return next()  if user.avatarurl or !user.twitter
+						feedr.readFeed "http://api.twitter.com/1/users/lookup.json?screen_name=#{user.twitter}", (err,twitterData) ->
 							return next(err)  if err
-							user.avatarurl = twitterdata.profile_image_url or null
+							user.avatar = twitterData.profile_image_url or null
 							return next()
 
 					# Avatar: Email
 					avatarTasks.push (next) ->
-						return next()  if user.avatarurl or !row.email
-						emailhash = require('crypto').createHash('md5').update(row.email).digest("hex")
-						user.avatarurl = "http://www.gravatar.com/avatar/#{emailhash}"
+						return next()  if user.avatarurl or !user.email
+						emailhash = require('crypto').createHash('md5').update(user.email).digest("hex")
+						user.avatar = "http://www.gravatar.com/avatar/#{emailhash}"
 						return next()
 
 					# Avatar: run
@@ -199,8 +250,8 @@ docpadConfig =
 				# Run
 				userTasks.run()
 
-			# Handle
-			return balUtil.flow([connect,fetchRows,fetchUsers],null,next)
+			# Run
+			return tasks.run('sync')
 
 		# Server Extend
 		# Used to add our own custom routes to the server before the docpad routes are added
