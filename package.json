@@ -36,6 +36,7 @@
 		"docpad-plugin-eco": "2.x",
 		"docpad-plugin-robotskirt": "2.x",
 		"docpad-plugin-partials": "2.x",
+		"docpad-plugin-services": "2.x",
 		"docpad-plugin-stylus": "2.x",
 		"docpad-plugin-text": "2.x"
 	},
