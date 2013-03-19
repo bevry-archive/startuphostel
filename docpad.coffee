@@ -51,6 +51,12 @@ spreadsheetRows = null
 docpadConfig =
 
 	# =================================
+	# Standard Configuration
+
+	regenerateEvery: 1000*60*30  # 30 minutes
+
+
+	# =================================
 	# Template Data
 
 	templateData:
