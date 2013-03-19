@@ -40,7 +40,7 @@ The hostel will have a very loose schedule, meaning that all events are optional
 - 12-3pm - Lunch provided
 - 7-9pm - Group dinner - an opportunity to talk about what you got done for the day, do your cheers and thanks, and relax in a more casual environment
 
-Each Friday night 6-7pm there will be lightning talks were people can showcase anything nifty they've done throughout the week.
+Each Friday night 6-9pm there will be lightning talks were people can showcase anything nifty they've done throughout the week.
 
 Every second Saturday we will hold presentations, workshops, and trainings that will be promoted outside the hostel to draw even bigger crowds, this is a great opportunity for you to showcase your work, present, network, and help make each other even better.
 
@@ -64,10 +64,14 @@ We're aiming for a max of $3000 for a month and $2000 for 2 weeks for this initi
 ## Register
 
 <p>
-	To register your interest <%- @partial('subscribe') %> then add your details to this <a href="https://docs.google.com/spreadsheet/ccc?key=0AqMqiLy7C3PhdFc3bTBXNTQzNG02WEdGNmxaWHBVVFE#gid=0">Google Spreadsheet</a> with your requirements.
+	To register your interest <%- @partial('subscribe') %> then add your details to this <a href="https://docs.google.com/spreadsheet/ccc?key=<%-@spreadsheetKey%>#gid=0">Google Spreadsheet</a> with your requirements.
 	We'll get in touch shortly after that.
 	You can also <%- @getTwitterFollowButton().replace(/\n/g,'').replace(/div/g,'span') %> and join our <a href="https://www.facebook.com/groups/bevry.hackathon/">Facebook Group</a> and <a href="http://webchat.freenode.net/?channels=startuphostel">IRC Chat Room</a> (<code>#startuphostel</code> on freenode).
 </p>
+
+These <%- @users.length %> people have already registered their interest, so what are you waiting for?
+
+<%- @partial('people',{users:@users,cachr:@cachr}) %>
 
 
 ## Future

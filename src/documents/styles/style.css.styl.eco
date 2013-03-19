@@ -56,6 +56,45 @@ a,a:link,a:visited
 a:hover
 	color: colorLinkHover !important
 
+// Clear
+.clear
+	clearfix()
+
+// People
+.people
+	&, *
+		margin: 0
+		padding: 0
+		border: none
+
+	a
+		text-decoration: none
+
+	ul, li
+		list-style: none
+
+	li
+		background: black
+		display: block
+		float: left
+		margin: 2px
+		position: relative
+
+		transition: all 0.5s ease-out
+		&:hover
+			transform: rotate(360deg)
+			z-index: 500
+			img
+				position: absolute
+				top: -21px
+				left: -21px
+				height: 84px
+				width: 84px
+
+	li,img
+		height: 42px
+		width: 42px
+
 
 
 @media screen and (max-width: 960px)

@@ -33,13 +33,17 @@
 	"dependencies": {
 		"docpad": "6.x",
 		"docpad-plugin-cachr": "2.x",
+		"docpad-plugin-coffeekup": "2.x",
 		"docpad-plugin-coffeescript": "2.x",
 		"docpad-plugin-eco": "2.x",
 		"docpad-plugin-robotskirt": "2.x",
 		"docpad-plugin-partials": "2.x",
 		"docpad-plugin-services": "2.x",
 		"docpad-plugin-stylus": "2.x",
-		"docpad-plugin-text": "2.x"
+		"docpad-plugin-text": "2.x",
+		"feedr": "~2.4.2",
+		"bal-util": "~1.16.11",
+		"google-spreadsheet": "~0.2.0"
 	},
 	"devDependencies": {
 		"docpad-plugin-livereload": "2.x"
