@@ -41,7 +41,7 @@
 		"docpad-plugin-services": "2.x",
 		"docpad-plugin-stylus": "2.x",
 		"docpad-plugin-text": "2.x",
-		"createsend": "~0.0.2",
+		"createsend": "git://github.com/logicalparadox/createsend.git",
 		"feedr": "~2.4.2",
 		"bal-util": "~1.16.11",
 		"google-spreadsheet": "~0.2.0"
