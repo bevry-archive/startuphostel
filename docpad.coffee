@@ -56,12 +56,12 @@ docpadConfig = {
 
 			# The website description (for SEO)
 			description: """
-				When your website appears in search results in say Google, the text here will be shown underneath your website's title.
+				Startup Hostel is an all year round work retreat in paradise for the doers of the world; you keep your costs down low, work on what you want, learn from amazing people, in amazing locaitons. You buy the tickets for the hostel, and we'll cover your standard life expenses for your stay (accommodation, food, wifi, etc).
 				"""
 
 			# The website keywords (for SEO) separated by commas
 			keywords: """
-				place, your, website, keywoards, here, keep, them, related, to, the, content, of, your, website
+				startup, startups, hostel, hostels, hackathon, work retreat, retreat, hackers, entreprenuers, coworking, incubator
 				"""
 
 			# The website's styles
