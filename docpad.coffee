@@ -156,6 +156,7 @@ docpadConfig =
 			docpad = @docpad
 			tasks = new balUtil.Group(next)
 			users = []
+			sales = 0
 
 			# Find User or Create
 			addUser = (newUser) ->
@@ -199,6 +200,7 @@ docpadConfig =
 					user.name = row.name or row.title or row.twitterusername or row.skypeusername or null
 					user.email = row.email or null
 					user.bio = row.bio or null
+					user.confirmed = String(row.confirmed).toLowerCase() in ['yes','true']
 					user.skype = row.skypeusername or null
 					user.twitter = row.twitterusername or null
 					user.facebook = (row.facebookurl or '').replace(/^.+com\//,'').replace(/\//g,'') or null
@@ -245,8 +247,12 @@ docpadConfig =
 
 			# Facebook Users
 			tasks.push (next) ->
-				fields = "about address bio email accounts gender name id religion username".replace(/\s/g,'%2C')
-				feedr.readFeed "https://graph.facebook.com/#{process.env.FACEBOOK_GROUP_ID}/members?fields=#{fields}&method=GET&format=json&callback=cb&access_token=#{process.env.FACEBOOK_ACCESS_TOKEN}", (err,data) ->
+				# Users
+				# https://neosmart-stream.de/facebook/how-to-create-a-facebook-access-token/
+				facebookGroupId = process.env.FACEBOOK_GROUP_ID
+				facebookAccessToken = process.env.FACEBOOK_ACCESS_TOKEN
+				facebookFields = "about address bio email accounts gender name id religion username".replace(/\s/g,'%2C')
+				feedr.readFeed "https://graph.facebook.com/#{facebookGroupId}/members?fields=#{facebookFields}&method=GET&format=json&callback=cb&access_token=#{facebookAccessToken}", (err,data) ->
 					return next(err)  if err
 
 					# Users
@@ -270,6 +276,7 @@ docpadConfig =
 				userTasks = new balUtil.Group (err) ->
 					return next(err)  if err
 					docpad.log 'info', "Fetched #{users.length} users"
+					opts.templateData.sales = sales
 					opts.templateData.users = users
 					return next()
 
@@ -280,6 +287,9 @@ docpadConfig =
 					user.text or= user.name + (if user.bio then ": #{user.bio}" else '')
 					user.website or= (if user.twitter then "http://twitter.com/#{user.twitter}") or (if user.facebook then "https://www.facebook.com/#{user.facebook}") or null
 					user.avatar or= null
+
+					# Sales
+					sales++  if user.confirmed
 
 					# Avatar
 					avatarTasks = new balUtil.Group(next)
