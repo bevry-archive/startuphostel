@@ -1,4 +1,4 @@
-# [Startup Hostel's Website](http://startup-hostel.org), built with [DocPad](http://docpad.org)
+# [Startup Hostel's Website](http://startuphostel.org), built with [DocPad](http://docpad.org)
 
 
 ## Getting Started
