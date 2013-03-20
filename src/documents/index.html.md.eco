@@ -74,6 +74,11 @@ These <%- @users?.length or '' %> people have already registered their interest:
 <%- @partial('people',{users:@users,cachr:@cachr}) %>
 
 
+## Sponsorship
+
+If this sounds like an amazing opportunity to you and you're serious about helping out, we have serveral sponsorship packages available that we'd love for you to be a part of. If you're interested, [send us an email right away](mailto:sponsor@startuphostel.org) and we'll get in touch as soon as we can.
+
+
 ## Future
 This is just the beginning. We plan on open-sourcing and documenting all the information in regards to the setup and maintenance of the hostel enabling others to create their own in their own ideal locations. We are especially keen on setting up another location in either [Vietnam](https://www.google.com.au/search?q=vietnam+beach&tbm=isch), [Thailand](https://www.google.com.au/search?q=thailand+beach&tbm=isch) or [Goa](https://www.google.com.au/search?q=Goa+beach&tbm=isch) in October 2013 as wet season hits Bali, so we can migrate over there for a while, then following on to either [Madagascar](https://www.google.com.au/search?q=madagascar+beach&tbm=isch), [Seychelles](https://www.google.com.au/search?q=seychelles+beach&tbm=isch) or [Fiji](https://www.google.com.au/search?q=fiji+beach&tbm=isch) thereafter as well as other locations. Though any location is good by us, the big vision is to have locations all over world, were people can just hop from one location to the other whenever they want and always maintain that awesome community of people regardless.
 
