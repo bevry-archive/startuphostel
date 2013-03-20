@@ -80,11 +80,11 @@ docpadConfig =
 			]
 
 			# The default title of our website
-			title: "Startup Hostel: The home for the doers of the world"
+			title: "Startup Hostel: The home in paradise for the doers of the world"
 
 			# The website description (for SEO)
 			description: """
-				Startup Hostel is an all year round work retreat in paradise for the doers of the world; you keep your costs down low, work on what you want, learn from amazing people, in amazing locaitons.
+				Startup Hostel is an all year round work retreat for the doers of the world; you keep costs down low, work on what you want, learn from amazing people, in amazing locaitons.
 				"""
 
 			# The website keywords (for SEO) separated by commas
