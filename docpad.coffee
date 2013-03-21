@@ -66,7 +66,6 @@ docpadConfig =
 
 		background: backgrounds[backgroundSelection].image
 		opacity: backgrounds[backgroundSelection].opacity
-		spreadsheetKey: process.env.GOOGLE_SPREADSHEET_KEY
 
 		# Specify some site properties
 		site:
@@ -172,13 +171,13 @@ docpadConfig =
 
 			# Spreadsheet Connection
 			tasks.push (next) ->
-				return next()  if spreadsheetConnection?
+				return next()  if spreadsheetConnection? or !(process.env.GOOGLE_SPREADSHEET_KEY and process.env.GOOGLE_USERNAME and process.env.GOOGLE_PASSWORD)
 				spreadsheetConnection = new (require('google-spreadsheet'))(process.env.GOOGLE_SPREADSHEET_KEY)
 				return spreadsheetConnection.setAuth(process.env.GOOGLE_USERNAME, process.env.GOOGLE_PASSWORD, next)
 
 			# Spreadsheet Info
 			tasks.push (next) ->
-				return next()  if spreadsheetInfo?
+				return next()  if spreadsheetInfo? or !(spreadsheetConnection)
 				spreadsheetConnection.getInfo (err,info) ->
 					return next(err)  if err
 					spreadsheetInfo = info
@@ -186,7 +185,7 @@ docpadConfig =
 
 			# Spreadsheet Rows
 			tasks.push (next) ->
-				return next() if spreadsheetRows?
+				return next() if spreadsheetRows? or !(spreadsheetInfo)
 				spreadsheetInfo.worksheets[0].getRows (err,rows) ->
 					return next(err)  if err
 					spreadsheetRows = rows
@@ -194,6 +193,7 @@ docpadConfig =
 
 			# Speadsheet Users
 			tasks.push ->
+				return  if !(spreadsheetRows)
 				for row in spreadsheetRows
 					# Apply user information
 					user = {}
@@ -209,6 +209,7 @@ docpadConfig =
 
 			# Campaign Monitor Users
 			tasks.push (next) ->
+				return next()  if !(process.env.CM_LIST_ID)
 				createsendConnection.listActive process.env.CM_LIST_ID, null, (err,data) ->
 					return next(err)  if err
 					for result in data.Results
@@ -246,9 +247,9 @@ docpadConfig =
 					return next()
 
 			# Facebook Users
+			# https://neosmart-stream.de/facebook/how-to-create-a-facebook-access-token/
 			tasks.push (next) ->
-				# Users
-				# https://neosmart-stream.de/facebook/how-to-create-a-facebook-access-token/
+				return next()  if !(process.env.FACEBOOK_GROUP_ID and process.env.FACEBOOK_ACCESS_TOKEN)
 				facebookGroupId = process.env.FACEBOOK_GROUP_ID
 				facebookAccessToken = process.env.FACEBOOK_ACCESS_TOKEN
 				facebookFields = "about address bio email accounts gender name id religion username".replace(/\s/g,'%2C')
