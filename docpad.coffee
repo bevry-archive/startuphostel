@@ -313,7 +313,7 @@ docpadConfig =
 					# Avatar: Email
 					avatarTasks.push (next) ->
 						return next()  if user.avatar or !user.email
-						user.avatar or= "http://www.gravatar.com/avatar/#{user.hash}"
+						user.avatar or= "http://www.gravatar.com/avatar/#{user.hash}.jpg"
 						return next()
 
 					# Avatar: run
@@ -340,8 +340,10 @@ docpadConfig =
 				rootPath: config.outPath
 			).process source, (err,data) ->
 				return next(err)  if err
-				balUtil.writeFile stylesheet.get('outPath'), data.embedded.plain, (err) ->
+				result = data.embedded.plain
+				balUtil.writeFile stylesheet.get('outPath'), result, (err) ->
 					return next(err)  if err
+					stylesheet.set('contentRendered',result)
 					return next()
 
 			# Done

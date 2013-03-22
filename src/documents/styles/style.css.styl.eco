@@ -8,10 +8,6 @@ colorLinkHover = blue
 *
 	box-sizing: border-box
 
-html
-	background: url("<%-@cachr @background%>") no-repeat center center fixed
-	background-size: cover
-
 .addthis_floating_style
 	left: 10px !important
 	box-sizing: content-box
@@ -134,6 +130,10 @@ html.ios
 		z-index: 50
 		position: relative
 
+
+html
+	background: url("<%-@cachr @background%>?embed") no-repeat center center fixed
+	background-size: cover
 
 <% for user in @users.filter((u) -> u.avatar): %>
 .person-<%-user.hash%> .person-name
