@@ -325,6 +325,28 @@ docpadConfig =
 			# Run
 			return tasks.run('sync')
 
+		# Generate After
+		generateAfter: (opts,next) ->
+			# Prepare
+			docpad = @docpad
+			config = docpad.getConfig()
+
+			# Fetch
+			stylesheet = docpad.getFileAtPath('styles/style')
+			source = stylesheet.get('contentRendered')
+
+			# Optimise
+			new (require('enhance-css'))(
+				rootPath: config.outPath
+			).process source, (err,data) ->
+				return next(err)  if err
+				balUtil.writeFile stylesheet.get('outPath'), data.embedded.plain, (err) ->
+					return next(err)  if err
+					return next()
+
+			# Done
+			true
+
 		# Server Extend
 		# Used to add our own custom routes to the server before the docpad routes are added
 		serverExtend: (opts) ->

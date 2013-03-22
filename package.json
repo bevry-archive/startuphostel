@@ -44,7 +44,8 @@
 		"createsend": "git://github.com/logicalparadox/createsend.git",
 		"feedr": "~2.4.3",
 		"bal-util": "~1.16.11",
-		"google-spreadsheet": "~0.2.0"
+		"google-spreadsheet": "~0.2.0",
+		"enhance-css": "~0.6.0"
 	},
 	"devDependencies": {
 		"docpad-plugin-livereload": "2.x"

@@ -137,5 +137,5 @@ html.ios
 
 <% for user in @users.filter((u) -> u.avatar): %>
 .person-<%-user.hash%> .person-name
-	background: url("<%=@cachr user.avatar%>") top left no-repeat
+	background: url("<%=@cachr user.avatar%>?embed") top left no-repeat
 <% end %>
