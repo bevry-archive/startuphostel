@@ -288,6 +288,7 @@ docpadConfig =
 					user.text or= user.name + (if user.bio then ": #{user.bio}" else '')
 					user.website or= (if user.twitter then "http://twitter.com/#{user.twitter}") or (if user.facebook then "https://www.facebook.com/#{user.facebook}") or null
 					user.avatar or= null
+					user.hash = require('crypto').createHash('md5').update(user.email or user.name or index).digest("hex")
 
 					# Sales
 					sales++  if user.confirmed
@@ -312,8 +313,7 @@ docpadConfig =
 					# Avatar: Email
 					avatarTasks.push (next) ->
 						return next()  if user.avatar or !user.email
-						emailhash = require('crypto').createHash('md5').update(user.email).digest("hex")
-						user.avatar or= "http://www.gravatar.com/avatar/#{emailhash}"
+						user.avatar or= "http://www.gravatar.com/avatar/#{user.hash}"
 						return next()
 
 					# Avatar: run

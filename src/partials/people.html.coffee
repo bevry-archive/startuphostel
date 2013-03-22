@@ -3,11 +3,11 @@ aside ".people", ->
 	ul ->
 		for user in (@users or [])
 			continue  unless user.avatar
-			li title:"#{h user.text}", ->
-				showAvatar = =>
-					img src:@cachr(user.avatar), alt:"#{h user.name}"
+			li ".person.person-#{user.hash}", title:"#{h user.text}", ->
+				showName = =>
+					span ".person-name", -> "#{h user.name}"
 				if user.website
-					a href:"#{h user.website}", showAvatar
+					a ".person-link", href:"#{h user.website}", showName
 				else
-					showAvatar()
+					showName()
 	div ".clear", ->

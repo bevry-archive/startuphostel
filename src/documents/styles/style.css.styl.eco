@@ -62,40 +62,46 @@ a:hover
 
 // People
 .people
-	&, *
+	&
+	*
 		margin: 0
 		padding: 0
 		border: none
 
-	a
-		text-decoration: none
-
-	ul, li
+	&
+	.person
 		list-style: none
 
-	li
-		background: black
+	.person
+	.person-name
+	.person-link
 		display: block
+		height: 42px
+		width: 42px
+		text-indent: -99999px
+
+	.person
 		float: left
 		margin: 2px
 		position: relative
 
-		transition: all 0.5s ease-out
+	.person-name
+	.perosn-link
+		position: absolute
+		top: 0
+		left: 0
+
+	.person-link
+		text-decoration: none
 		&:hover
-			transform: rotate(360deg)
-			z-index: 500
-			img
-				position: absolute
-				top: -21px
-				left: -21px
-				height: 84px
-				width: 84px
+			.person-name
+				z-index: 500
+				box-shadow: 0 0 5px #555
 
-	li,img
-		height: 42px
-		width: 42px
-
-
+	.person-name
+		overflow: hidden
+		background-size: 42px 42px !important
+		transition: all 0.2s ease-out
 
 @media screen and (max-width: 850px)
 	article
@@ -128,3 +134,8 @@ html.ios
 		z-index: 50
 		position: relative
 
+
+<% for user in @users.filter((u) -> u.avatar): %>
+.person-<%-user.hash%> .person-name
+	background: url("<%=@cachr user.avatar%>") top left no-repeat
+<% end %>

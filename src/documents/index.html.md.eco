@@ -84,11 +84,10 @@ This is just the beginning. We plan on open-sourcing and documenting all the inf
 
 
 ## Picture
-The wallpaper of this website was taken by [Joshua Gourneau](http://josh.gourneau.com) at [Startup Workaway](http://startupworkaway.com/) 2012, a two week retreat in Thailand that Startup Hostel founder [Benjamin Lupton](http://balupton.com) attended. The person in the photo is [Philip Ashlock](http://phil.ashlock.us), an open-government enthusiast, working during dusk in the restaurant of the accommodation. You can see the complete gallery of the event [here](https://www.facebook.com/media/set/?set=a.10100736090530565.2700291.9410692&type=3), [here](https://www.facebook.com/media/set/?set=a.10150606180140670.380974.620410669&type=3) and [here](https://www.facebook.com/media/set/?set=a.525284590378.2033297.206700536&type=3) (facebook login required). [We also use this favicon](http://commons.wikimedia.org/wiki/File:Gfi-set01-hostel.png).
+The wallpaper of this website was taken by [Joshua Gourneau](http://josh.gourneau.com) at [Startup Workaway](http://startupworkaway.com/) 2012, a two week retreat in Thailand that Startup Hostel founder [Benjamin Lupton](http://balupton.com) attended. The person in the photo is [Philip Ashlock](http://phil.ashlock.us), an open-government enthusiast, working during dusk in the restaurant of the accommodation. You can see the complete gallery of the event [here](https://www.facebook.com/media/set/?set=a.10100736090530565.2700291.9410692&type=3), [here](https://www.facebook.com/media/set/?set=a.10150606180140670.380974.620410669&type=3) and [here](https://www.facebook.com/media/set/?set=a.525284590378.2033297.206700536&type=3) (facebook login required). [We also use this favicon](http://commons.wikimedia.org/wiki/File:Gfi-set01-hostel.png). [Here is our website's source :)](https://github.com/bevry/startup-hostel)
 
 
 ## Share
-
 
 <div class="social-buttons">
 	<%- @getSocialButtons(['TwitterFollow','FacebookLike','TwitterTweet','GooglePlusOne','RedditSubmit','HackerNewsSubmit']) %>
