@@ -1,5 +1,5 @@
 # Import
-balUtil = require('bal-util')
+TaskGroup = require('taskgroup').TaskGroup
 feedr = new (require('feedr')).Feedr
 createsend = require('createsend')
 createsendConnection = new createsend(process.env.CM_KEY)
@@ -153,7 +153,7 @@ docpadConfig =
 		extendTemplateData: (opts,next) ->
 			# Prepare
 			docpad = @docpad
-			tasks = new balUtil.Group(next)
+			tasks = new TaskGroup().once('complete',next)
 			users = []
 			sales = 0
 
@@ -170,13 +170,13 @@ docpadConfig =
 				return newUser
 
 			# Spreadsheet Connection
-			tasks.push (next) ->
+			tasks.addTask (next) ->
 				return next()  if spreadsheetConnection? or !(process.env.GOOGLE_SPREADSHEET_KEY and process.env.GOOGLE_USERNAME and process.env.GOOGLE_PASSWORD)
 				spreadsheetConnection = new (require('google-spreadsheet'))(process.env.GOOGLE_SPREADSHEET_KEY)
 				return spreadsheetConnection.setAuth(process.env.GOOGLE_USERNAME, process.env.GOOGLE_PASSWORD, next)
 
 			# Spreadsheet Info
-			tasks.push (next) ->
+			tasks.addTask (next) ->
 				return next()  if spreadsheetInfo? or !(spreadsheetConnection)
 				spreadsheetConnection.getInfo (err,info) ->
 					return next(err)  if err
@@ -184,7 +184,7 @@ docpadConfig =
 					return next()
 
 			# Spreadsheet Rows
-			tasks.push (next) ->
+			tasks.addTask (next) ->
 				return next() if spreadsheetRows? or !(spreadsheetInfo)
 				spreadsheetInfo.worksheets[0].getRows (err,rows) ->
 					return next(err)  if err
@@ -192,7 +192,7 @@ docpadConfig =
 					return next()
 
 			# Speadsheet Users
-			tasks.push ->
+			tasks.addTask ->
 				return  if !(spreadsheetRows)
 				for row in spreadsheetRows
 					# Apply user information
@@ -208,7 +208,7 @@ docpadConfig =
 					addUser(user)
 
 			# Campaign Monitor Users
-			tasks.push (next) ->
+			tasks.addTask (next) ->
 				return next()  if !(process.env.CM_LIST_ID)
 				createsendConnection.listActive process.env.CM_LIST_ID, null, (err,data) ->
 					return next(err)  if err
@@ -226,7 +226,7 @@ docpadConfig =
 					return next()
 
 			# Twitter Users
-			tasks.push (next) ->
+			tasks.addTask (next) ->
 				feedr.readFeed "http://api.twitter.com/1/statuses/followers.json?screen_name=StartupHostel&cursor=-1", (err,data) ->
 					return next(err)  if err
 					return next(data.errors[0].message)  if data?.errors?[0]?.message
@@ -248,7 +248,7 @@ docpadConfig =
 
 			# Facebook Users
 			# https://neosmart-stream.de/facebook/how-to-create-a-facebook-access-token/
-			tasks.push (next) ->
+			tasks.addTask (next) ->
 				return next()  if !(process.env.FACEBOOK_GROUP_ID and process.env.FACEBOOK_ACCESS_TOKEN)
 				facebookGroupId = process.env.FACEBOOK_GROUP_ID
 				facebookAccessToken = process.env.FACEBOOK_ACCESS_TOKEN
@@ -272,9 +272,9 @@ docpadConfig =
 					return next()
 
 			# Normalize Fields
-			tasks.push (next) ->
+			tasks.addTask (next) ->
 				# Prepare
-				userTasks = new balUtil.Group (err) ->
+				userTasks = new TaskGroup().setConfig(concurrency:0).once 'complete', (err) ->
 					return next(err)  if err
 					docpad.log 'info', "Fetched #{users.length} users"
 					opts.templateData.sales = sales
@@ -282,9 +282,8 @@ docpadConfig =
 					return next()
 
 				# Users
-				balUtil.each users, (user,index) ->  userTasks.push (next) ->
+				users.forEach (user,index) ->  userTasks.addTask (next) ->
 					# Basics
-					user = users[index]
 					user.text or= user.name + (if user.bio then ": #{user.bio}" else '')
 					user.website or= (if user.twitter then "http://twitter.com/#{user.twitter}") or (if user.facebook then "https://www.facebook.com/#{user.facebook}") or null
 					user.avatar or= null
@@ -294,16 +293,16 @@ docpadConfig =
 					sales++  if user.confirmed
 
 					# Avatar
-					avatarTasks = new balUtil.Group(next)
+					avatarTasks = new TaskGroup().once('complete',next)
 
 					# Avatar: Facebook
-					avatarTasks.push (next) ->
+					avatarTasks.addTask (next) ->
 						return next()  if user.avatar or !user.facebook
 						user.avatar or= "http://graph.facebook.com/#{user.facebook}/picture"
 						return next()
 
 					# Avatar: Twitter
-					avatarTasks.push (next) ->
+					avatarTasks.addTask (next) ->
 						return next()  if user.avatar or !user.twitter
 						feedr.readFeed "http://api.twitter.com/1/users/lookup.json?screen_name=#{user.twitter}", (err,twitterUser) ->
 							return next(err)  if err
@@ -311,19 +310,19 @@ docpadConfig =
 							return next()
 
 					# Avatar: Email
-					avatarTasks.push (next) ->
+					avatarTasks.addTask (next) ->
 						return next()  if user.avatar or !user.email
 						user.avatar or= "http://www.gravatar.com/avatar/#{user.hash}.jpg"
 						return next()
 
 					# Avatar: run
-					avatarTasks.run('sync')
+					avatarTasks.run()
 
 				# Run
 				userTasks.run()
 
 			# Run
-			return tasks.run('sync')
+			return tasks.run()
 
 		# Generate After
 		generateAfter: (opts,next) ->
@@ -341,7 +340,7 @@ docpadConfig =
 			).process source, (err,data) ->
 				return next(err)  if err
 				result = data.embedded.plain
-				balUtil.writeFile stylesheet.get('outPath'), result, (err) ->
+				require('safefs').writeFile stylesheet.get('outPath'), result, (err) ->
 					return next(err)  if err
 					stylesheet.set('contentRendered',result)
 					return next()
