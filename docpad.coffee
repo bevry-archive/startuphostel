@@ -332,12 +332,12 @@ docpadConfig =
 						email: row.email
 						bio: row.bio
 						confirmed: row.confirmed
-						avatar: row.avatarurl
-						skype: row.skypeusername
-						twitter: row.twitterusername
-						github: row.githubusername
-						facebook: row.facebookurl
-						website: row.websiteurl
+						avatar: row.avatar or row.avatarurl
+						skype: row.skype or row.skypeusername
+						twitter: row.twitter or row.twitterusername
+						github: row.github or row.githubusername
+						facebook: row.facebook or row.facebookurl
+						website: row.website or row.websiteurl
 						spreadsheetUser: row
 					)
 
