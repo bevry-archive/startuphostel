@@ -1,9 +1,9 @@
 {
-	"name": "html5-boilerplate.docpad",
+	"name": "startup-hostel.docpad",
 	"version": "0.1.0",
 	"private": true,
-	"description": "HTML5 Boilerplate skeleton for DocPad. Bare essentials for building a modern website with best practices.",
-	"homepage": "https://github.com/docpad/html5-boilerplate.docpad",
+	"description": "Startup Hostel, the home for the doers of the world",
+	"homepage": "https://github.com/bevry/startup-hostel",
 	"keywords": [
 		"docpad-skeleton",
 		"docpad",
@@ -14,17 +14,17 @@
 	],
 	"author": "Bevry Pty Ltd <us@bevry.me> (http://bevry.me)",
 	"maintainers": [
-		"Benjamin Lupton <b@lupton.cc> (http://balupton.com)"
+		"Benjamin Lupton <b@lupton.cc> (https://github.com/balupton)"
 	],
 	"contributors": [
-		"Benjamin Lupton <b@lupton.cc> (http://balupton.com)"
+		"Benjamin Lupton <b@lupton.cc> (https://github.com/balupton)"
 	],
 	"bugs": {
-		"url": "https://github.com/docpad/html5-boilerplate.docpad/issues"
+		"url": "https://github.com/bevry/startup-hostel/issues"
 	},
 	"repository" : {
 		"type" : "git",
-		"url" : "http://github.com/docpad/html5-boilerplate.docpad.git"
+		"url" : "http://github.com/bevry/startup-hostel.git"
 	},
 	"engines" : {
 		"node": "0.10",
