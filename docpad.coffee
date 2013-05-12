@@ -45,11 +45,6 @@ backgrounds =
 		image: "https://fbcdn-sphotos-c-a.akamaihd.net/hphotos-ak-snc7/412669_525284605348_1284671781_o.jpg?dl=1"
 backgroundSelection = 'us2'
 
-# Spreadsheet
-spreadsheetConnection = null
-spreadsheetInfo = null
-spreadsheetRows = null
-
 # DocPad Configuration
 docpadConfig =
 
@@ -155,6 +150,12 @@ docpadConfig =
 			docpad = @docpad
 			tasks = new TaskGroup().once('complete',next)
 			sales = 0
+			gsheets = null
+			spreadsheet = null
+			worksheets = null
+			worksheet = null
+			rows = null
+
 
 			# =========================
 			# Users
@@ -197,11 +198,11 @@ docpadConfig =
 								# Adjust
 								switch key
 									when 'facebook','github','twitter'
-										value = value.replace(/^.+com\//,'').replace(/\//g,'') or null
+										value = value.replace(/^.+com\//,'').replace(/\//g,'').replace(/\@/g, '') or null
 									when 'email'
 										value = value.replace('\u0040','@')
 									when 'confirmed'
-										value = if String(value).toLowerCase() in ['yes','true'] then true else false
+										value = if String(value).toLowerCase() in ['yes','true'] then 'TRUE' else false
 
 								# Apply
 								if opts.safe
@@ -224,11 +225,6 @@ docpadConfig =
 
 					# Apply
 					switch key
-						when 'id', 'hash'
-							value = require('crypto').createHash('md5').update(
-								@get('username') or Math.random()
-							).digest('hex')
-
 						when 'username'
 							value = @attributes.username or @get('email') or @get('name')
 
@@ -260,6 +256,39 @@ docpadConfig =
 					# Return
 					return value or null
 
+				save: (next) ->
+					# Prepare
+					keys = 'name email bio confirmed avatar skype twitter github facebook website'.split(' ')
+
+					# Handle
+					row = @get('spreadsheetUser')
+					if row
+						changed = false
+						for key in keys
+							if (oldValue = row.data[key] or '') isnt (newValue = @attributes[key] or '')
+								row.data[key] = newValue
+								console.log 'CHANGED:', row.title, key, {newValue, oldValue}
+								changed = true
+						if changed
+							rows.save row, (err, row) =>
+								return next(err)  if err
+								console.log 'SAVED:', row.title
+								return next()
+						else
+							console.log 'same:', row.title
+					else
+						data = {}
+						for key in keys
+							data[key] = @attributes[key] or ''
+						rows.create data, (err, row) =>
+							return next(err)  if err
+							console.log 'ADDED:', row.title
+							@set('spreadsheetUser', row)
+							return next()
+
+					# Chain
+					@
+
 			# Create user
 			createUser = (data) ->
 				if data instanceof User
@@ -272,7 +301,7 @@ docpadConfig =
 			findUser = (findUser) ->
 				findUser = createUser(findUser)
 				for user in users
-					checks = ['name','email','skype','twitter','facebook','website']
+					checks = 'name email skype twitter facebook github website avatar'.split(' ')
 					for check in checks
 						if user.attributes[check] and (user.attributes[check] is findUser.attributes[check])
 							return user
@@ -302,42 +331,58 @@ docpadConfig =
 
 			# Spreadsheet Connection
 			tasks.addTask (next) ->
-				return next()  if spreadsheetConnection? or !(process.env.GOOGLE_SPREADSHEET_KEY and process.env.GOOGLE_USERNAME and process.env.GOOGLE_PASSWORD)
-				spreadsheetConnection = new (require('google-spreadsheet'))(process.env.GOOGLE_SPREADSHEET_KEY)
-				return spreadsheetConnection.setAuth(process.env.GOOGLE_USERNAME, process.env.GOOGLE_PASSWORD, next)
+				return next()  if gsheets? or !(process.env.GOOGLE_SPREADSHEET_KEY and process.env.GOOGLE_USERNAME and process.env.GOOGLE_PASSWORD)
+				authData =
+					email: process.env.GOOGLE_USERNAME
+					password: process.env.GOOGLE_PASSWORD
 
-			# Spreadsheet Info
-			tasks.addTask (next) ->
-				return next()  if spreadsheetInfo? or !(spreadsheetConnection)
-				spreadsheetConnection.getInfo (err,info) ->
+				# Sheets
+				gsheets = require('google-sheets')
+				gsheets.auth authData, (err) ->
 					return next(err)  if err
-					spreadsheetInfo = info
-					return next()
 
-			# Spreadsheet Rows
-			tasks.addTask (next) ->
-				return next() if spreadsheetRows? or !(spreadsheetInfo)
-				spreadsheetInfo.worksheets[0].getRows (err,rows) ->
-					return next(err)  if err
-					spreadsheetRows = rows
-					return next()
+					# Spreadsheet
+					gsheets.getSpreadsheet process.env.GOOGLE_SPREADSHEET_KEY, (err, _spreadsheet) ->
+						return next(err)  if err
+						spreadsheet = _spreadsheet
+
+						# Worksheets
+						spreadsheet.getWorksheets (err, _worksheets) ->
+							return next(err)  if err
+							worksheets = _worksheets
+
+							# Check
+							if worksheets.length is 0
+								err = new Error('No worksheets!')
+								console.log 'spreadsheet:', spreadsheet
+								return next(err)
+
+							# Rows
+							worksheet = worksheets[0]
+							worksheet.getRows (err, _rows) ->
+								return next(err)  if err
+								rows = _rows
+								return next()
 
 			# Speadsheet Users
 			tasks.addTask ->
-				return  if !(spreadsheetRows)
-				for row in spreadsheetRows
+				return  if !(rows)
+				rows.forEach (row) ->
+					# Prepare
+					data = row.data
+
 					# Apply user information
 					user = addUser(
-						name: row.name
-						email: row.email
-						bio: row.bio
-						confirmed: row.confirmed
-						avatar: row.avatar or row.avatarurl
-						skype: row.skype or row.skypeusername
-						twitter: row.twitter or row.twitterusername
-						github: row.github or row.githubusername
-						facebook: row.facebook or row.facebookurl
-						website: row.website or row.websiteurl
+						name: data.name
+						email: data.email
+						bio: data.bio
+						confirmed: data.confirmed
+						avatar: data.avatar or data.avatarurl
+						skype: data.skype or data.skypeusername
+						twitter: data.twitter or data.twitterusername
+						github: data.github or data.githubusername
+						facebook: data.facebook or data.facebookurl
+						website: data.website or data.websiteurl
 						spreadsheetUser: row
 					)
 
@@ -414,7 +459,7 @@ docpadConfig =
 			# Normalize Fields
 			tasks.addTask (next) ->
 				# Prepare
-				userTasks = new TaskGroup().setConfig(concurrency:0).once 'complete', (err) ->
+				usersTasks = new TaskGroup().setConfig(concurrency:0).once 'complete', (err) ->
 					return next(err)  if err
 					docpad.log 'info', "Fetched #{users.length} users"
 					opts.templateData.sales = sales
@@ -422,7 +467,7 @@ docpadConfig =
 					return next()
 
 				# Users
-				users.forEach (user,index) ->  userTasks.addTask (next) ->
+				users.forEach (user,index) ->  usersTasks.addTask (next) ->
 					# Note users that have no username
 					unless user.get('username')
 						console.log 'warn', "User has no username:", user, index
@@ -430,25 +475,25 @@ docpadConfig =
 					# Sales
 					sales++  if user.get('confirmed')
 
-					# Avatar
-					avatarTasks = new TaskGroup().once('complete', next)
+					# User Tasks
+					userTasks = new TaskGroup().once('complete', next)
 
-					# Avatar: Facebook
-					avatarTasks.addTask (next) ->
+					# User Tasks: Avatar: Facebook
+					userTasks.addTask (next) ->
 						return next()  if user.get('avatar') or !(facebook = user.get('facebook'))
 						user.set('avatar', "http://graph.facebook.com/#{facebook}/picture")
 						return next()
 
-					# Avatar: Twitter
-					avatarTasks.addTask (next) ->
+					# User Tasks: Avatar: Twitter
+					userTasks.addTask (next) ->
 						return next()  if user.get('avatar') or !(twitter = user.get('twitter'))
 						feedr.readFeed "http://api.twitter.com/1/users/lookup.json?screen_name=#{twitter}", (err,twitterUser) ->
 							return next(err)  if err
 							user.set('avatar', twitterUser.profile_image_url)
 							return next()
 
-					# Avatar: Email
-					avatarTasks.addTask (next) ->
+					# User Tasks: Avatar: Email
+					userTasks.addTask (next) ->
 						return next()  if user.get('avatar') or !(email = user.get('email'))
 						emailHash = require('crypto').createHash('md5').update(
 							email
@@ -456,11 +501,15 @@ docpadConfig =
 						user.set('avatar', "http://www.gravatar.com/avatar/#{emailHash}.jpg")
 						return next()
 
-					# Avatar: run
-					avatarTasks.run()
+					# User Tasks: Save
+					userTasks.addTask (next) ->
+						user.save(next)
+
+					# User Tasks: run
+					userTasks.run()
 
 				# Run
-				userTasks.run()
+				usersTasks.run()
 
 			# Run
 			return tasks.run()
