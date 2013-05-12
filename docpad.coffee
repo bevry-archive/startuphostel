@@ -86,14 +86,6 @@ docpadConfig =
 				startup, startups, hostel, hostels, hackathon, work retreat, retreat, hackers, entreprenuers, coworking, incubator
 				"""
 
-			# The website's styles
-			styles: [
-				# 'http://raw.github.com/iamceege/tooltipster/2.1.3/css/tooltipster.css'
-				'/vendor/normalize.css'
-				'/vendor/h5bp.css'
-				'/styles/style.css'
-			]
-
 			# The website's scripts
 			scripts: [
 				# 'http://code.jquery.com/jquery-1.9.1.min.js'
@@ -144,7 +136,7 @@ docpadConfig =
 	events:
 
 		# Extend Template Data
-		# Prepare our spreadsheet
+		# Fetch the users and inject our styles
 		extendTemplateData: (opts,next) ->
 			# Prepare
 			docpad = @docpad
@@ -155,6 +147,15 @@ docpadConfig =
 			worksheets = null
 			worksheet = null
 			rows = null
+
+			# Styles
+			# We do it in .style rather than .site.styles as docpad only does a shallow extend
+			opts.templateData.styles = [
+				# 'http://raw.github.com/iamceege/tooltipster/2.1.3/css/tooltipster.css'
+				'/vendor/normalize.css'
+				'/vendor/h5bp.css'
+				'/styles/style.css?timestamp='+((new Date()).getTime())
+			]
 
 
 			# =========================
@@ -225,11 +226,28 @@ docpadConfig =
 
 					# Apply
 					switch key
+						when 'hash'
+							# hash for user identification
+							# don't save this as this may change
+							username = @get('username')
+							if username
+								value = require('crypto').createHash('md5').update(
+									username
+								).digest('hex')
+
 						when 'username'
 							value = @attributes.username or @get('email') or @get('name')
 
 						when 'name'
 							value = @attributes.name or @get('skype') or @get('twitter') or @get('facebook') or @get('github')
+
+						when 'emailHash'
+							# user for gravatars
+							email = @get('email')
+							if email
+								value = require('crypto').createHash('md5').update(
+									email
+								).digest('hex')
 
 						when 'text'
 							name = @get('name')
@@ -251,6 +269,8 @@ docpadConfig =
 							value = @attributes.website or @get('twitterURL') or @get('facebookURL')
 
 						else
+							if typeof @attributes[key] is 'undefined'
+								docpad.log 'warn', 'Tried to access an unknown attribute:', key
 							value = @attributes[key]
 
 					# Return
@@ -509,10 +529,7 @@ docpadConfig =
 
 					# User Tasks: Avatar: Email
 					userTasks.addTask (next) ->
-						return next()  if user.get('avatar') or !(email = user.get('email'))
-						emailHash = require('crypto').createHash('md5').update(
-							email
-						).digest('hex')
+						return next()  if user.get('avatar') or !(emailHash = user.get('emailHash'))
 						user.set('avatar', "http://www.gravatar.com/avatar/#{emailHash}.jpg")
 						return next()
 
