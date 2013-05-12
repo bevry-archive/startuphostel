@@ -257,29 +257,43 @@ docpadConfig =
 					return value or null
 
 				save: (next) ->
+					# Check
+					return next()  unless rows
+
 					# Prepare
 					keys = 'name email bio confirmed avatar skype twitter github facebook website'.split(' ')
 
 					# Handle
 					row = @get('spreadsheetUser')
 					if row
+						# Apply
 						changed = false
 						for key in keys
 							if (oldValue = row.data[key] or '') isnt (newValue = @attributes[key] or '')
 								row.data[key] = newValue
 								console.log 'CHANGED:', row.title, key, {newValue, oldValue}
 								changed = true
+
+						# Update
 						if changed
 							rows.save row, (err, row) =>
 								return next(err)  if err
 								console.log 'SAVED:', row.title
 								return next()
+
+						# Same
 						else
 							console.log 'same:', row.title
+							return next()
+
+					# Add
 					else
+						# Apply
 						data = {}
 						for key in keys
 							data[key] = @attributes[key] or ''
+
+						# Create
 						rows.create data, (err, row) =>
 							return next(err)  if err
 							console.log 'ADDED:', row.title
@@ -359,36 +373,37 @@ docpadConfig =
 
 							# Rows
 							worksheet = worksheets[0]
-							worksheet.getRows (err, _rows) ->
-								return next(err)  if err
-								rows = _rows
-								return next()
+							return next()
 
 			# Speadsheet Users
-			tasks.addTask ->
-				return  if !(rows)
-				rows.forEach (row) ->
-					# Prepare
-					data = row.data
+			tasks.addTask (next) ->
+				return  if !worksheet
+				worksheet.getRows (err, _rows) ->
+					return next(err)  if err
+					rows = _rows
+					rows.forEach (row) ->
+						# Prepare
+						data = row.data
 
-					# Apply user information
-					user = addUser(
-						name: data.name
-						email: data.email
-						bio: data.bio
-						confirmed: data.confirmed
-						avatar: data.avatar or data.avatarurl
-						skype: data.skype or data.skypeusername
-						twitter: data.twitter or data.twitterusername
-						github: data.github or data.githubusername
-						facebook: data.facebook or data.facebookurl
-						website: data.website or data.websiteurl
-						spreadsheetUser: row
-					)
+						# Apply user information
+						user = addUser(
+							name: data.name
+							email: data.email
+							bio: data.bio
+							confirmed: data.confirmed
+							avatar: data.avatar or data.avatarurl
+							skype: data.skype or data.skypeusername
+							twitter: data.twitter or data.twitterusername
+							github: data.github or data.githubusername
+							facebook: data.facebook or data.facebookurl
+							website: data.website or data.websiteurl
+							spreadsheetUser: row
+						)
+					return next()
 
 			# Campaign Monitor Users
 			tasks.addTask (next) ->
-				return next()  if !(process.env.CM_LIST_ID)
+				return next()  if !process.env.CM_LIST_ID
 				createsendConnection.listActive process.env.CM_LIST_ID, null, (err,data) ->
 					return next(err)  if err
 					for cmUser in data.Results
