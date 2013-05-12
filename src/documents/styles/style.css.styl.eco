@@ -135,7 +135,7 @@ html
 	background: url("<%-@cachr @background%>?embed") no-repeat center center fixed
 	background-size: cover
 
-<% for user in @users.filter((u) -> u.avatar): %>
-.person-<%-user.hash%> .person-name
-	background: url("<%=@cachr user.avatar%>?embed") top left no-repeat
+<% for user in @users.filter((u) -> u.get('avatar')): %>
+.person-<%-user.get('hash')%> .person-name
+	background: url("<%=@cachr user.get('avatar')%>?embed") top left no-repeat
 <% end %>

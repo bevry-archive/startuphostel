@@ -154,20 +154,151 @@ docpadConfig =
 			# Prepare
 			docpad = @docpad
 			tasks = new TaskGroup().once('complete',next)
-			users = []
 			sales = 0
 
-			# Find User or Create
-			addUser = (newUser) ->
+			# =========================
+			# Users
+
+			# Store
+			users = []
+
+			# Class
+			class User
+				attributes: null
+
+				constructor: (values) ->
+					@attributes =
+						name: null
+						email: null
+						skype: null
+						github: null
+						twitter: null
+						twitterID: null  # id number
+						facebook: null
+						facebookID: null  # id number
+						gender: null
+						website: null
+						bio: null
+						confirmed: null
+						avatar: null  # url
+					@set(values)
+					@
+
+				toJSON: ->
+					return @attributes
+
+				set: (key,value,opts={}) ->
+					# Set
+					if key
+						# Single
+						if typeof key is 'string'
+							# Check
+							if value
+								# Adjust
+								switch key
+									when 'facebook','github','twitter'
+										value = value.replace(/^.+com\//,'').replace(/\//g,'') or null
+									when 'email'
+										value = value.replace('\u0040','@')
+									when 'confirmed'
+										value = if String(value).toLowerCase() in ['yes','true'] then true else false
+
+								# Apply
+								if opts.safe
+									@attributes[key] or= value or null
+								else
+									@attributes[key] = value or null
+
+						# Multiple
+						else
+							# Apply each
+							for own _key,_value of key
+								@set(_key, _value, value or opts or null)
+
+					# Chain
+					@
+
+				get: (key) ->
+					# Prepare
+					value = null
+
+					# Apply
+					switch key
+						when 'id', 'hash'
+							value = require('crypto').createHash('md5').update(
+								@get('username') or Math.random()
+							).digest('hex')
+
+						when 'username'
+							value = @attributes.username or @get('email') or @get('name')
+
+						when 'name'
+							value = @attributes.name or @get('skype') or @get('twitter') or @get('facebook') or @get('github')
+
+						when 'text'
+							name = @get('name')
+							if name
+								bio = @get('bio')
+								value = name + (if bio then ": #{bio}" else '')
+
+						when 'twitterURL'
+							twitter = @get('twitter')
+							if twitter
+								value = "http://twitter.com/#{twitter}"
+
+						when 'facebookURL'
+							facebook = @get('facebook')
+							if facebook
+								value = "https://www.facebook.com/#{facebook}"
+
+						when 'website'
+							value = @attributes.website or @get('twitterURL') or @get('facebookURL')
+
+						else
+							value = @attributes[key]
+
+					# Return
+					return value or null
+
+			# Create user
+			createUser = (data) ->
+				if data instanceof User
+					user = data
+				else
+					user = new User(data)
+				return user
+
+			# Find user
+			findUser = (findUser) ->
+				findUser = createUser(findUser)
 				for user in users
 					checks = ['name','email','skype','twitter','facebook','website']
 					for check in checks
-						if user[check] and user[check] is newUser[check]
-							for own key,value of newUser
-								user[key] or= value or null
+						if user.attributes[check] and (user.attributes[check] is findUser.attributes[check])
 							return user
-				users.push(newUser)
-				return newUser
+				return null
+
+			# Add user
+			addUser = (newUser) ->
+				# Find
+				newUser = createUser(newUser)
+				foundUser = findUser(newUser)
+				if foundUser
+					# Merge
+					foundUser.set(newUser.toJSON(), {safe:true})
+
+					# Return
+					return foundUser
+				else
+					# Add
+					users.push(newUser)
+
+					# Return
+					return newUser
+
+
+			# =========================
+			# Sources
 
 			# Spreadsheet Connection
 			tasks.addTask (next) ->
@@ -196,32 +327,39 @@ docpadConfig =
 				return  if !(spreadsheetRows)
 				for row in spreadsheetRows
 					# Apply user information
-					user = {}
-					user.name = row.name or row.title or row.twitterusername or row.skypeusername or null
-					user.email = row.email or null
-					user.bio = row.bio or null
-					user.confirmed = String(row.confirmed).toLowerCase() in ['yes','true']
-					user.skype = row.skypeusername or null
-					user.twitter = row.twitterusername or null
-					user.facebook = (row.facebookurl or '').replace(/^.+com\//,'').replace(/\//g,'') or null
-					user.website = row.websiteurl or null
-					addUser(user)
+					user = addUser(
+						name: row.name
+						email: row.email
+						bio: row.bio
+						confirmed: row.confirmed
+						avatar: row.avatarurl
+						skype: row.skypeusername
+						twitter: row.twitterusername
+						github: row.githubusername
+						facebook: row.facebookurl
+						website: row.websiteurl
+						spreadsheetUser: row
+					)
 
 			# Campaign Monitor Users
 			tasks.addTask (next) ->
 				return next()  if !(process.env.CM_LIST_ID)
 				createsendConnection.listActive process.env.CM_LIST_ID, null, (err,data) ->
 					return next(err)  if err
-					for result in data.Results
+					for cmUser in data.Results
 						# Apply user information
-						user = {}
-						user.name = result.Name or null
-						user.email = result.EmailAddress
-						user.skype = null
-						user.twitter = null
-						for customField in result.CustomFields
+						user = createUser(
+							name: cmUser.Name
+							email: cmUser.EmailAddress
+							cmUser: cmUser
+						)
+
+						# Merge in custom fields
+						for customField in cmUser.CustomFields
 							customFieldKey = customField.Key.toLowerCase()
-							user[customFieldKey] or= customField.Value or null
+							user.set(customFieldKey, customField.Value, {safe:true})
+
+						# Add user
 						addUser(user)
 					return next()
 
@@ -234,14 +372,15 @@ docpadConfig =
 					# Users
 					for twitterUser in (data.users or [])
 						# Apply user information
-						user = {}
-						user.name = twitterUser.name
-						user.bio = twitterUser.description or null
-						user.twitter = twitterUser.screen_name
-						user.twitterID = twitterUser.id
-						user.website = twitterUser.url or "http://twitter.com/#{twitterUser.screen_name}"
-						user.avatar = twitterUser.profile_image_url or null
-						addUser(user)
+						user = addUser(
+							name: twitterUser.name
+							bio: twitterUser.description
+							twitter: twitterUser.screen_name
+							twitterID: twitterUser.id
+							website: twitterUser.url
+							avatar: twitterUser.profile_image_url
+							twitterUser: twitterUser
+						)
 
 					# Done
 					return next()
@@ -259,14 +398,15 @@ docpadConfig =
 					# Users
 					for facebookUser in data.data
 						# Apply user information
-						user = {}
-						user.name = facebookUser.name or null
-						user.bio = facebookUser.bio or null
-						user.gender = facebookUser.gender or null
-						user.email = (facebookUser.email or '').replace('\u0040','@') or null
-						user.facebook = facebookUser.username
-						user.facebookID = facebookUser.id
-						addUser(user)
+						user = addUser(
+							name: facebookUser.name
+							bio: facebookUser.bio
+							gender: facebookUser.gender
+							email: facebookUser.email
+							facebook: facebookUser.username
+							facebookID: facebookUser.id
+							facebookUser: facebookUser
+						)
 
 					# Done
 					return next()
@@ -283,36 +423,37 @@ docpadConfig =
 
 				# Users
 				users.forEach (user,index) ->  userTasks.addTask (next) ->
-					# Basics
-					user.text or= user.name + (if user.bio then ": #{user.bio}" else '')
-					user.website or= (if user.twitter then "http://twitter.com/#{user.twitter}") or (if user.facebook then "https://www.facebook.com/#{user.facebook}") or null
-					user.avatar or= null
-					user.hash = require('crypto').createHash('md5').update(user.email or user.name or index).digest("hex")
+					# Note users that have no username
+					unless user.get('username')
+						console.log 'warn', "User has no username:", user, index
 
 					# Sales
-					sales++  if user.confirmed
+					sales++  if user.get('confirmed')
 
 					# Avatar
-					avatarTasks = new TaskGroup().once('complete',next)
+					avatarTasks = new TaskGroup().once('complete', next)
 
 					# Avatar: Facebook
 					avatarTasks.addTask (next) ->
-						return next()  if user.avatar or !user.facebook
-						user.avatar or= "http://graph.facebook.com/#{user.facebook}/picture"
+						return next()  if user.get('avatar') or !(facebook = user.get('facebook'))
+						user.set('avatar', "http://graph.facebook.com/#{facebook}/picture")
 						return next()
 
 					# Avatar: Twitter
 					avatarTasks.addTask (next) ->
-						return next()  if user.avatar or !user.twitter
-						feedr.readFeed "http://api.twitter.com/1/users/lookup.json?screen_name=#{user.twitter}", (err,twitterUser) ->
+						return next()  if user.get('avatar') or !(twitter = user.get('twitter'))
+						feedr.readFeed "http://api.twitter.com/1/users/lookup.json?screen_name=#{twitter}", (err,twitterUser) ->
 							return next(err)  if err
-							user.avatar or= twitterUser.profile_image_url or null
+							user.set('avatar', twitterUser.profile_image_url)
 							return next()
 
 					# Avatar: Email
 					avatarTasks.addTask (next) ->
-						return next()  if user.avatar or !user.email
-						user.avatar or= "http://www.gravatar.com/avatar/#{user.hash}.jpg"
+						return next()  if user.get('avatar') or !(email = user.get('email'))
+						emailHash = require('crypto').createHash('md5').update(
+							email
+						).digest('hex')
+						user.set('avatar', "http://www.gravatar.com/avatar/#{emailHash}.jpg")
 						return next()
 
 					# Avatar: run
