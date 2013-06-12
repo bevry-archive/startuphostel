@@ -183,6 +183,7 @@ docpadConfig =
 						bio: null
 						confirmed: null
 						avatar: null  # url
+						spreadsheetUser: null
 					@set(values)
 					@
 
@@ -443,6 +444,7 @@ docpadConfig =
 						addUser(user)
 					return next()
 
+			###
 			# Twitter Users
 			tasks.addTask (next) ->
 				feedr.readFeed "http://api.twitter.com/1/statuses/followers.json?screen_name=StartupHostel&cursor=-1", (err,data) ->
@@ -464,6 +466,7 @@ docpadConfig =
 
 					# Done
 					return next()
+			###
 
 			# Facebook Users
 			# https://neosmart-stream.de/facebook/how-to-create-a-facebook-access-token/
