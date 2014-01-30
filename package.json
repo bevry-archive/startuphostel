@@ -42,10 +42,10 @@
 		"docpad-plugin-stylus": "2.x",
 		"docpad-plugin-text": "2.x",
 		"createsend": "git://github.com/logicalparadox/createsend.git",
-		"feedr": "~2.5.0",
-		"taskgroup": "~3.1.2",
-		"safefs": "~3.0.1",
-		"google-sheets": "git://github.com/balupton/google-sheets.git#patch-1",
+		"feedr": "~2.7.7",
+		"taskgroup": "~3.3.6",
+		"safefs": "~3.1.0",
+		"google-sheets": "~0.0.3",
 		"enhance-css": "~0.6.0"
 	},
 	"devDependencies": {

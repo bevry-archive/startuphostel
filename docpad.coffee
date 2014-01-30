@@ -1,7 +1,9 @@
 # Import
-TaskGroup = require('taskgroup').TaskGroup
-feedr = new (require('feedr')).Feedr
+{TaskGroup} = require('taskgroup')
+{Feedr} = require('feedr')
 createsend = require('createsend')
+
+feedr = new Feedr()
 createsendConnection = new createsend(process.env.CM_KEY)
 
 ###
@@ -140,13 +142,17 @@ docpadConfig =
 		extendTemplateData: (opts,next) ->
 			# Prepare
 			docpad = @docpad
-			tasks = new TaskGroup().once('complete',next)
 			sales = 0
 			gsheets = null
 			spreadsheet = null
 			worksheets = null
 			worksheet = null
 			rows = null
+
+			# Tasks
+			tasks = new TaskGroup().once('complete', next).on('item.run', (item) ->
+				console.log "Running #{item.getConfig().name}"
+			)
 
 			# Styles
 			# We do it in .style rather than .site.styles as docpad only does a shallow extend
@@ -364,8 +370,7 @@ docpadConfig =
 			# =========================
 			# Sources
 
-			# Spreadsheet Connection
-			tasks.addTask (next) ->
+			tasks.addTask 'Spreadsheet Connection', (next) ->
 				return next()  if gsheets? or !(process.env.GOOGLE_SPREADSHEET_KEY and process.env.GOOGLE_USERNAME and process.env.GOOGLE_PASSWORD)
 				authData =
 					email: process.env.GOOGLE_USERNAME
@@ -396,9 +401,8 @@ docpadConfig =
 							worksheet = worksheets[0]
 							return next()
 
-			# Speadsheet Users
-			tasks.addTask (next) ->
-				return  if !worksheet
+			tasks.addTask 'Speadsheet Users', (next) ->
+				return next()  if !worksheet
 				worksheet.getRows (err, _rows) ->
 					return next(err)  if err
 					rows = _rows
@@ -422,8 +426,7 @@ docpadConfig =
 						)
 					return next()
 
-			# Campaign Monitor Users
-			tasks.addTask (next) ->
+			tasks.addTask 'Campaign Monitor Users', (next) ->
 				return next()  if !process.env.CM_LIST_ID
 				createsendConnection.listActive process.env.CM_LIST_ID, null, (err,data) ->
 					return next(err)  if err
@@ -447,7 +450,10 @@ docpadConfig =
 			###
 			# Twitter Users
 			tasks.addTask (next) ->
-				feedr.readFeed "http://api.twitter.com/1/statuses/followers.json?screen_name=StartupHostel&cursor=-1", (err,data) ->
+				feedOptions =
+					url: "http://api.twitter.com/1/statuses/followers.json?screen_name=StartupHostel&cursor=-1"
+					parse: 'json'
+				feedr.readFeed feedOptions, (err,data) ->
 					return next(err)  if err
 					return next(data.errors[0].message)  if data?.errors?[0]?.message
 
@@ -468,15 +474,17 @@ docpadConfig =
 					return next()
 			###
 
-			# Facebook Users
 			# https://neosmart-stream.de/facebook/how-to-create-a-facebook-access-token/
-			tasks.addTask (next) ->
+			tasks.addTask 'Facebook Users', (next) ->
 				return next()  if !(process.env.FACEBOOK_GROUP_ID and process.env.FACEBOOK_ACCESS_TOKEN)
 				facebookGroupId = process.env.FACEBOOK_GROUP_ID
 				facebookAccessToken = process.env.FACEBOOK_ACCESS_TOKEN
 				facebookFields = "about address bio email accounts gender name id religion username".replace(/\s/g,'%2C')
-				feedr.readFeed "https://graph.facebook.com/#{facebookGroupId}/members?fields=#{facebookFields}&method=GET&format=json&callback=cb&access_token=#{facebookAccessToken}", (err,data) ->
-					return next(err)  if err
+				feedOptions =
+					url: "https://graph.facebook.com/#{facebookGroupId}/members?fields=#{facebookFields}&method=GET&format=json&callback=cb&access_token=#{facebookAccessToken}"
+					parse: 'json'
+				feedr.readFeed feedOptions, (err,data) ->
+					return next(err)  if err or !data.data
 
 					# Users
 					for facebookUser in data.data
@@ -494,8 +502,7 @@ docpadConfig =
 					# Done
 					return next()
 
-			# Normalize Fields
-			tasks.addTask (next) ->
+			tasks.addTask 'Normalize Fields', (next) ->
 				# Prepare
 				usersTasks = new TaskGroup().setConfig(concurrency:0).once 'complete', (err) ->
 					return next(err)  if err
@@ -525,7 +532,10 @@ docpadConfig =
 					# User Tasks: Avatar: Twitter
 					userTasks.addTask (next) ->
 						return next()  if user.get('avatar') or !(twitter = user.get('twitter'))
-						feedr.readFeed "http://api.twitter.com/1/users/lookup.json?screen_name=#{twitter}", (err,twitterUser) ->
+						feedOptions =
+							url: "http://api.twitter.com/1/users/lookup.json?screen_name=#{twitter}"
+							parse: 'json'
+						feedr.readFeed feedOptions, (err,twitterUser) ->
 							return next(err)  if err
 							user.set('avatar', twitterUser.profile_image_url)
 							return next()
