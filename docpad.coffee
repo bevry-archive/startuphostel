@@ -589,6 +589,10 @@ docpadConfig =
 			# Extract the server from the options
 			{server} = opts
 			docpad = @docpad
+			codeSuccess = 200
+			codeBadRequest = 400
+			codeRedirectPermanent = 301
+			codeRedirectTemporary = 302
 
 			# As we are now running in an event,
 			# ensure we are using the latest copy of the docpad configuraiton
@@ -603,6 +607,24 @@ docpadConfig =
 					res.redirect(newUrl+req.url, 301)
 				else
 					next()
+
+			# Common Redirects
+			redirects =
+					'/survey': '/list'
+					'/compare': '/list'
+					'/list': 'https://docs.google.com/spreadsheet/ccc?key=0AqMqiLy7C3PhdC1pR2Q0dm9Ec0lwcnF0aFBQWVhwa3c'
+					''
+					'/wiki': 'https://github.com/bevry/startup-hostel/wiki/_pages'
+					'/github': 'https://github.com/bevry/startup-hostel'
+			server.use (req,res,next) ->
+				target = redirects[req.url]
+				if target
+					res.redirect(codeRedirectPermanent, target)
+				else
+					next()
+
+			# Done
+			return
 
 # Export
 module.exports = docpadConfig
