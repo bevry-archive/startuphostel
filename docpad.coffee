@@ -613,7 +613,6 @@ docpadConfig =
 					'/survey': '/list'
 					'/compare': '/list'
 					'/list': 'https://docs.google.com/spreadsheet/ccc?key=0AqMqiLy7C3PhdC1pR2Q0dm9Ec0lwcnF0aFBQWVhwa3c'
-					''
 					'/wiki': 'https://github.com/bevry/startup-hostel/wiki/_pages'
 					'/github': 'https://github.com/bevry/startup-hostel'
 			server.use (req,res,next) ->
