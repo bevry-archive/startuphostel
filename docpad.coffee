@@ -1,5 +1,5 @@
 # Import
-{TaskGroup} = require('taskgroup')
+TaskGroup = require('taskgroup')
 {Feedr} = require('feedr')
 createsend = require('createsend')
 
@@ -32,7 +32,7 @@ backgrounds =
 		image: "https://fbcdn-sphotos-d-a.akamaihd.net/hphotos-ak-prn1/538452_10150606184340670_1928444854_n.jpg"
 	us2:
 		web: "https://www.facebook.com/photo.php?fbid=10100736092491635&set=a.10100736090530565.2700291.9410692&type=3&src=https%3A%2F%2Ffbcdn-sphotos-h-a.akamaihd.net%2Fhphotos-ak-ash3%2F534164_10100736092491635_376734153_n.jpg&size=720%2C480"
-		image: "https://fbcdn-sphotos-h-a.akamaihd.net/hphotos-ak-ash3/534164_10100736092491635_376734153_n.jpg"
+		image: "https://raw.githubusercontent.com/bevry/designs/master/startup-hostel/wallpapers/phil.jpg"
 		opacity: 0.85 # 0.7
 	us4:
 		web: "https://www.facebook.com/photo.php?fbid=10100736169517275&set=a.10100736090530565.2700291.9410692&type=3&src=https%3A%2F%2Ffbcdn-sphotos-d-a.akamaihd.net%2Fhphotos-ak-prn1%2F553251_10100736169517275_2026680824_n.jpg&size=720%2C480"
@@ -150,7 +150,7 @@ docpadConfig =
 			rows = null
 
 			# Tasks
-			tasks = new TaskGroup().once('complete', next).on('item.run', (item) ->
+			tasks = new TaskGroup().done(next).on('item.run', (item) ->
 				console.log "Running #{item.getConfig().name}"
 			)
 
@@ -504,7 +504,7 @@ docpadConfig =
 
 			tasks.addTask 'Normalize Fields', (next) ->
 				# Prepare
-				usersTasks = new TaskGroup().setConfig(concurrency:0).once 'complete', (err) ->
+				usersTasks = new TaskGroup(concurrency:0).done (err) ->
 					return next(err)  if err
 					docpad.log 'info', "Fetched #{users.length} users"
 					opts.templateData.sales = sales
@@ -521,34 +521,34 @@ docpadConfig =
 					sales++  if user.get('confirmed')
 
 					# User Tasks
-					userTasks = new TaskGroup().once('complete', next)
+					userTasks = new TaskGroup().done(next)
 
 					# User Tasks: Avatar: Facebook
-					userTasks.addTask (next) ->
-						return next()  if user.get('avatar') or !(facebook = user.get('facebook'))
+					userTasks.addTask (complete) ->
+						return complete()  if user.get('avatar') or !(facebook = user.get('facebook'))
 						user.set('avatar', "http://graph.facebook.com/#{facebook}/picture")
-						return next()
+						return complete()
 
 					# User Tasks: Avatar: Twitter
-					userTasks.addTask (next) ->
-						return next()  if user.get('avatar') or !(twitter = user.get('twitter'))
+					userTasks.addTask (complete) ->
+						return complete()  if user.get('avatar') or !(twitter = user.get('twitter'))
 						feedOptions =
 							url: "http://api.twitter.com/1/users/lookup.json?screen_name=#{twitter}"
 							parse: 'json'
 						feedr.readFeed feedOptions, (err,twitterUser) ->
-							return next(err)  if err
+							return complete(err)  if err
 							user.set('avatar', twitterUser.profile_image_url)
-							return next()
+							return complete()
 
 					# User Tasks: Avatar: Email
-					userTasks.addTask (next) ->
-						return next()  if user.get('avatar') or !(emailHash = user.get('emailHash'))
+					userTasks.addTask (complete) ->
+						return complete()  if user.get('avatar') or !(emailHash = user.get('emailHash'))
 						user.set('avatar', "http://www.gravatar.com/avatar/#{emailHash}.jpg")
-						return next()
+						return complete()
 
 					# User Tasks: Save
-					userTasks.addTask (next) ->
-						user.save(next)
+					userTasks.addTask (complete) ->
+						user.save(complete)
 
 					# User Tasks: run
 					userTasks.run()
