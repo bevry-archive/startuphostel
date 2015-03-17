@@ -1,9 +1,7 @@
 # Import
 TaskGroup = require('taskgroup')
-{Feedr} = require('feedr')
 createsend = require('createsend')
-
-feedr = new Feedr()
+feedr = null
 createsendConnection = new createsend(process.env.CM_KEY)
 
 ###
@@ -148,6 +146,9 @@ docpadConfig =
 			worksheets = null
 			worksheet = null
 			rows = null
+
+			# Import
+			feedr ?= require('feedr').create({log: docpad.log})
 
 			# Tasks
 			tasks = new TaskGroup().done(next).on('item.run', (item) ->
@@ -303,7 +304,7 @@ docpadConfig =
 
 						# Update
 						if changed
-							rows.save row, (err, row) =>
+							rows.save row, (err, row) ->
 								return next(err)  if err
 								console.log 'SAVED:', row.title
 								return next()
@@ -575,7 +576,7 @@ docpadConfig =
 			).process source, (err,data) ->
 				return next(err)  if err
 				result = data.embedded.plain
-				require('safefs').writeFile stylesheet.get('outPath'), result, (err) ->
+				require('fs').writeFile stylesheet.get('outPath'), result, (err) ->
 					return next(err)  if err
 					stylesheet.set('contentRendered',result)
 					return next()
