@@ -61,7 +61,7 @@
     "docpad-plugin-eco": "~2.1.0",
     "docpad-plugin-marked": "~2.3.0",
     "docpad-plugin-partials": "~2.9.2",
-    "docpad-plugin-raw": "~2.4.0",
+    "docpad-plugin-raw": "~2.4.1",
     "docpad-plugin-services": "~2.6.0",
     "docpad-plugin-stylus": "~2.9.0",
     "docpad-plugin-text": "~2.3.3",
