@@ -4,6 +4,28 @@
   "private": true,
   "description": "Startup Hostel, the home for the doers of the world",
   "homepage": "https://github.com/bevry/startup-hostel",
+  "licenses": [
+    {
+      "type": "MIT",
+      "for": "code"
+    },
+    {
+      "type": "CC-BY-4.0",
+      "for": "everything else (including content, media and design)"
+    }
+  ],
+  "badges": {
+    "travis": true,
+    "npm": false,
+    "npmdownloads": false,
+    "david": false,
+    "daviddev": false,
+    "gratipay": "docpad",
+    "flattr": "344188/balupton-on-Flattr",
+    "paypal": "QB8GQPZAH84N6",
+    "bitcoin": "https://coinbase.com/checkouts/9ef59f5479eec1d97d63382c9ebcb93a",
+    "wishlist": "http://amzn.com/w/2F8TXKSNAFG4V"
+  },
   "keywords": [
     "docpad-skeleton",
     "docpad",
@@ -50,7 +72,8 @@
     "taskgroup": "^4.3.0"
   },
   "devDependencies": {
-    "docpad-plugin-livereload": "2"
+    "docpad-plugin-livereload": "2",
+    "projectz": "^0.5.0"
   },
   "main": "node_modules/docpad/bin/docpad-server"
 }
