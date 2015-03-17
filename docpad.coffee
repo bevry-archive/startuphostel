@@ -151,8 +151,8 @@ docpadConfig =
 			feedr ?= require('feedr').create({log: docpad.log})
 
 			# Tasks
-			tasks = new TaskGroup().done(next).on('item.run', (item) ->
-				console.log "Running #{item.getConfig().name}"
+			tasks = new TaskGroup().done(next).on('item.started', (item) ->
+				console.log "Running #{item.getNames()}"
 			)
 
 			# Styles
