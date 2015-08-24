@@ -1,15 +1,52 @@
-# March 17, 2015
+# August 25, 2015
 # https://docpad.org/docs/deploy
+
+# Use the latest travis infrastructure
+sudo: false
+
+# We use node
 language: node_js
-script: "npm test"
 node_js:
-  - "0.12"
+  - iojs
 cache:
   directories:
     - node_modules
+
+# Prepare and run our tests
+script: "npm test"
+
+# Custom Notifications
+# travis encrypt "$TRAVIS_NOTIFICATION_EMAIL" --add notifications.email.recipients
+# travis encrypt "$SLACK_SUBDOMAIN:$SLACK_TRAVIS_TOKEN#updates" --add notifications.slack
 notifications:
-  irc:
-    - "irc.freenode.org#bevry-dev"
   email:
     recipients:
-      - travisci@bevry.me
+      secure: dnfHa0bSns5e38r3ok+m0gF/vXcschtT9ETmMepmXYr/BXcW6Vn5nSH1B1aT1wF/8QAjKw4ZEPAnNqP8K1qWrRymOX60LkxkRmY8s5uLMxNWVvPauddUIDEOGSPzVSSVfsA3PD0EP9KC+dizcJYCKob1srMVXkNifl+Q0v1WxXo=
+
+# Deployment
+after_success: >
+  if ([ ! -z "$DEPLOY_TOKEN" ] &&
+      [ "$TRAVIS_BRANCH" == "$DEPLOY_BRANCH" ] &&
+      [ -z "$TRAVIS_TAG" ] &&
+      [ "$TRAVIS_PULL_REQUEST" == "false" ]); then
+    echo "Deploying";
+    git config --global user.email "$DEPLOY_EMAIL";
+    git config --global user.name "$DEPLOY_NAME";
+    git remote rm origin;
+    git remote add origin "https://$DEPLOY_USER:$DEPLOY_TOKEN@github.com/$TRAVIS_REPO_SLUG.git";
+    npm run-script deploy;
+    echo "Deployed";
+  else
+    echo "Skipped deploy"
+  fi
+
+# Custom Configuration
+# travis encrypt "DEPLOY_USER=$GITHUB_USERNAME" --add env.global
+# travis encrypt "DEPLOY_TOKEN=$GITHUB_TRAVIS_TOKEN" --add env.global
+env:
+  global:
+    - DEPLOY_BRANCH='master'  # this is the branch name that you want tested and deployed, set correctly
+    - DEPLOY_NAME='Travis CI Deployer'  # this is the name that is used for the deployment commit, set to whatever
+    - DEPLOY_EMAIL='deployer@travis-ci.org'  # this is the email that is used for the deployment commit, set to whatever
+    - secure: hA1rTXrTCDLCp/V/icMHpOHPo9M639JRPPlZCBvPwD61T1vPFtxCmv5XIp7bxEBE12Gxq5gWMF11hbsXvltNCImjfofSO2ZpDHh5/JevOQjTC/GZM2yVo8Ewvf5IvSVnTkoOuCQDusEFoLtPZkHqALa0YbxtLk0NVf31rSTHk3g=
+    - secure: RZkOyCuFSMzXgrfvpKraiSIUV1z3UDT0QR9DqAU3Wa3VfgV7x0CrSWZEUZ7WIzTKvRK5bQw+/VUM5DcerFonD1xCFqkEebKOlJHy1ZW4dCUWrosPYCtBbSNs5tal11YxrsFoHhDwWsCjyAULQRgYf1OHr3onlOtU+I16+brndgI=
