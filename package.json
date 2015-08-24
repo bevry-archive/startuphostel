@@ -71,6 +71,7 @@
     "taskgroup": "^4.3.0"
   },
   "devDependencies": {
+    "docpad-plugin-ghpages": "~2.4.4",
     "docpad-plugin-livereload": "~2.6.1",
     "projectz": "^0.5.0"
   },
@@ -78,6 +79,7 @@
   "scripts": {
     "start": "node_modules/.bin/docpad-server",
     "test": "node_modules/.bin/docpad generate --debug --silent",
-    "info": "node_modules/.bin/docpad info --silent"
+    "info": "node_modules/.bin/docpad info --silent",
+    "deploy": "node_modules/.bin/docpad deploy-ghpages --silent --env static"
   }
 }
