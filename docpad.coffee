@@ -99,10 +99,6 @@ docpadConfig =
 					applicationId: '266367676718271'
 				twitterTweetButton: 'StartupHostel'
 				twitterFollowButton: 'StartupHostel'
-				
-				#gauges: '51427e6f108d7b293d0000d4'
-				#googleAnalytics: 'UA-35505181-3'
-				# ^ no more external analytics, cloudflare gives us what we need
 
 
 		# -----------------------------
