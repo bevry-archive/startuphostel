@@ -614,6 +614,7 @@ docpadConfig =
 					'/list': 'https://docs.google.com/spreadsheet/ccc?key=0AqMqiLy7C3PhdC1pR2Q0dm9Ec0lwcnF0aFBQWVhwa3c'
 					'/wiki': 'https://github.com/bevry/startup-hostel/wiki/_pages'
 					'/github': 'https://github.com/bevry/startup-hostel'
+					'/facebook': 'https://www.facebook.com/groups/bevry.hackathon/'
 			server.use (req,res,next) ->
 				target = redirects[req.url]
 				if target
